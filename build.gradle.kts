@@ -4,6 +4,8 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 group = "de.dwcaesar"
 version = "0.0.1-SNAPSHOT"
 
@@ -19,10 +21,20 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	// https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#mockito-instrumentation
+	// explicitly setting up instrumentation for inline mocking
+	mockitoAgent("org.mockito:mockito-core") { isTransitive = false }
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	// improves integration with IDEs, for faster restarts and easier debugging
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 tasks.withType<Test> {
+	jvmArgs = listOf("-javaagent:${mockitoAgent.asPath}")
 	useJUnitPlatform()
 }
