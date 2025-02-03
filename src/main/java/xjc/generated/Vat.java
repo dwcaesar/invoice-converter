@@ -24,7 +24,7 @@ import jakarta.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "vat")
 @XmlEnum
-@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
 public enum Vat {
 
     @XmlEnumValue("full")

@@ -1,0 +1,80 @@
+{
+  "title": "invoice",
+  "description": "JSON representation of an invoice for further processing",
+  "definitions": {
+    "address": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        }
+      }
+    },
+    "item": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "number"
+        },
+        "vatType": {
+          "type": "string",
+          "enum": ["full", "reduced", "none"]
+        },
+        "itemPrice": {
+          "type": "number"
+        },
+        "positionSum": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "invoiceNumber": {
+      "description": "unique identifier of this invoice",
+      "type": "number"
+    },
+    "billingAddress": {
+      "type": "object",
+      "$ref": "#/definitions/address"
+    },
+    "invoiceAddress": {
+      "type": "object",
+      "$ref": "#/definitions/address"
+    },
+    "paymentMethod": {
+      "type": "string",
+      "enum": ["credit card", "invoice", "surname"]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "#/definitions/item"
+      }
+    },
+    "totalSumNetto": {
+      "type": "number"
+    },
+    "partialSumFull": {
+      "type": "number"
+    },
+    "partialSumReduced": {
+      "type": "number"
+    },
+    "totalSumBrutto": {
+      "type": "number"
+    }
+  }
+}

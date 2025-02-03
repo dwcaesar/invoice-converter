@@ -34,20 +34,20 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "address", propOrder = {
 
 })
-@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
 public class Address {
 
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected String name;
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected String street;
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected String zip;
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected String city;
 
     /**
@@ -58,7 +58,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public String getName() {
         return name;
     }
@@ -71,7 +71,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setName(String value) {
         this.name = value;
     }
@@ -84,7 +84,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public String getStreet() {
         return street;
     }
@@ -97,7 +97,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setStreet(String value) {
         this.street = value;
     }
@@ -110,7 +110,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public String getZip() {
         return zip;
     }
@@ -123,7 +123,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setZip(String value) {
         this.zip = value;
     }
@@ -136,7 +136,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public String getCity() {
         return city;
     }
@@ -149,7 +149,7 @@ public class Address {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setCity(String value) {
         this.city = value;
     }

@@ -37,21 +37,21 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "item", propOrder = {
 
 })
-@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
 public class Item {
 
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected String name;
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected BigInteger amount;
     @XmlElement(required = true)
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected BigDecimal itemPrice;
     @XmlElement(required = true)
     @XmlSchemaType(name = "string")
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected Vat vat;
 
     /**
@@ -62,7 +62,7 @@ public class Item {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public String getName() {
         return name;
     }
@@ -75,7 +75,7 @@ public class Item {
      *     {@link String }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setName(String value) {
         this.name = value;
     }
@@ -88,7 +88,7 @@ public class Item {
      *     {@link BigInteger }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public BigInteger getAmount() {
         return amount;
     }
@@ -101,7 +101,7 @@ public class Item {
      *     {@link BigInteger }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setAmount(BigInteger value) {
         this.amount = value;
     }
@@ -114,7 +114,7 @@ public class Item {
      *     {@link BigDecimal }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public BigDecimal getItemPrice() {
         return itemPrice;
     }
@@ -127,7 +127,7 @@ public class Item {
      *     {@link BigDecimal }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setItemPrice(BigDecimal value) {
         this.itemPrice = value;
     }
@@ -140,7 +140,7 @@ public class Item {
      *     {@link Vat }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public Vat getVat() {
         return vat;
     }
@@ -153,7 +153,7 @@ public class Item {
      *     {@link Vat }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setVat(Vat value) {
         this.vat = value;
     }

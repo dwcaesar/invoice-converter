@@ -47,23 +47,23 @@ import jakarta.xml.bind.annotation.XmlType;
     "netto",
     "brutto"
 })
-@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+@Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
 public class Invoice {
 
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected BigInteger invoiceNumber;
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected Address billingAddress;
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected Address shippingAddress;
     @XmlSchemaType(name = "string")
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected Method paymentMethod;
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected List<Item> item;
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected BigDecimal netto;
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     protected BigDecimal brutto;
 
     /**
@@ -74,7 +74,7 @@ public class Invoice {
      *     {@link BigInteger }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public BigInteger getInvoiceNumber() {
         return invoiceNumber;
     }
@@ -87,7 +87,7 @@ public class Invoice {
      *     {@link BigInteger }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setInvoiceNumber(BigInteger value) {
         this.invoiceNumber = value;
     }
@@ -100,7 +100,7 @@ public class Invoice {
      *     {@link Address }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public Address getBillingAddress() {
         return billingAddress;
     }
@@ -113,7 +113,7 @@ public class Invoice {
      *     {@link Address }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setBillingAddress(Address value) {
         this.billingAddress = value;
     }
@@ -126,7 +126,7 @@ public class Invoice {
      *     {@link Address }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public Address getShippingAddress() {
         return shippingAddress;
     }
@@ -139,7 +139,7 @@ public class Invoice {
      *     {@link Address }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setShippingAddress(Address value) {
         this.shippingAddress = value;
     }
@@ -152,7 +152,7 @@ public class Invoice {
      *     {@link Method }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public Method getPaymentMethod() {
         return paymentMethod;
     }
@@ -165,7 +165,7 @@ public class Invoice {
      *     {@link Method }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setPaymentMethod(Method value) {
         this.paymentMethod = value;
     }
@@ -192,7 +192,7 @@ public class Invoice {
      * 
      * 
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public List<Item> getItem() {
         if (item == null) {
             item = new ArrayList<>();
@@ -208,7 +208,7 @@ public class Invoice {
      *     {@link BigDecimal }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public BigDecimal getNetto() {
         return netto;
     }
@@ -221,7 +221,7 @@ public class Invoice {
      *     {@link BigDecimal }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setNetto(BigDecimal value) {
         this.netto = value;
     }
@@ -234,7 +234,7 @@ public class Invoice {
      *     {@link BigDecimal }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public BigDecimal getBrutto() {
         return brutto;
     }
@@ -247,7 +247,7 @@ public class Invoice {
      *     {@link BigDecimal }
      *     
      */
-    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-01-31T09:48:01+01:00")
+    @Generated(value = "com.sun.tools.xjc.Driver", comments = "JAXB RI v3.0.2", date = "2025-02-03T12:35:35+01:00")
     public void setBrutto(BigDecimal value) {
         this.brutto = value;
     }
