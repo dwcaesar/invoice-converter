@@ -12,4 +12,5 @@ public class Item {
     private Integer amount;
     private BigDecimal itemPrice;
     private BigDecimal positionSum;
+    private VATType vatType;
 }
