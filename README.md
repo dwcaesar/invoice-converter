@@ -8,9 +8,23 @@ TBD
 
 ### The use case
 TBD
-### Mesurments
+### Measurments
+When measuring the quality of the generated test data we consider following common metrics[1:]:
+
+1. Completeness
+2. Unambiguous
+3. Correctness
+4. Timeliness
+5. Accuracy
+6. Consistency
+7. freedom_from_redundancy
+8. Relevance
+9. Uniformity
+10. Reliability
+    
+## Conclusion
 TBD
 
-## Conclusion
-
+## Sources
+[1:] https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html
 
