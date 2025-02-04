@@ -9,7 +9,7 @@ TBD
 ### The use case
 TBD
 ### Measurments
-When measuring the quality of the generated test data we consider following common metrics[1:]:
+When measuring the quality of the generated test data we consider following common metrics[1]:
 
 1. Completeness
 2. Unambiguous
