@@ -1,6 +1,8 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "invoice",
   "description": "JSON representation of an invoice for further processing",
+
   "definitions": {
     "address": {
       "properties": {
@@ -16,7 +18,9 @@
         "city": {
           "type": "string"
         }
-      }
+      },
+      "required": ["name", "city", "street", "zip"],
+      "additionalProperties": false
     },
     "item": {
       "properties": {
@@ -36,7 +40,9 @@
         "positionSum": {
           "type": "number"
         }
-      }
+      },
+      "required": ["name", "amount", "itemPrice", "positionSum", "vatType"],
+      "additionalProperties": false
     }
   },
   "type": "object",
@@ -76,5 +82,7 @@
     "totalSumBrutto": {
       "type": "number"
     }
-  }
+  },
+  "required": ["billingAddress", "invoiceAddress", "invoiceNumber", "items", "partialSumFull", "partialSumReduced", "paymentMethod", "totalSumBrutto", "totalSumNetto"],
+  "additionalProperties": false
 }
