@@ -26,5 +26,5 @@ When measuring the quality of the generated test data we consider following comm
 TBD
 
 ## Sources
-[1:] https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html
+[1]: https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html
 
