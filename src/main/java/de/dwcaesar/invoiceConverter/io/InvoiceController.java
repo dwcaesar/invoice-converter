@@ -1,6 +1,6 @@
 package de.dwcaesar.invoiceConverter.io;
 
-import de.dwcaesar.invoiceConverter.invoice.Invoice;
+import de.dwcaesar.invoiceConverter.invoice.model.Invoice;
 import de.dwcaesar.invoiceConverter.invoice.InvoiceConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class InvoiceController {
     }
 
     @PostMapping(value = "/toJson", consumes = "application/xml", produces = "application/json")
-    public Invoice toJson(@RequestBody generated.Invoice invoice) {
+    public Invoice toJson(@RequestBody de.dwcaesar.invoiceConverter.io.model.Invoice invoice) {
         return invoiceConverter.convert(invoice);
     }
 

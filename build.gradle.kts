@@ -2,7 +2,6 @@ plugins {
 	java
 	id("org.springframework.boot") version "3.4.2"
 	id("io.spring.dependency-management") version "1.1.7"
-	id("com.github.bjornvester.xjc") version "1.8.1"
 }
 
 val mockitoAgent = configurations.create("mockitoAgent")
@@ -14,12 +13,6 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
-}
-
-xjc {
-	xjcVersion.set("3.0.2") // jakarta
-	outputJavaDir.set(layout.projectDirectory.dir("/src/main/java/xjc"))
-	markGenerated.set(true)
 }
 
 repositories {
