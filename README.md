@@ -44,7 +44,8 @@ Furthermore we take into account following aspects of AI as a test data genratio
 TBD
 
 ## Sources
-* [1]: https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html "General Data Quality Metrics"
-* [2]: https://github.com/sdv-dev/SDV?tab=readme-ov-file "SDV"
-* [3]: https://mostly.ai "Mostly AI"
+
+[1]: https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html "General Data Quality Metrics"
+[2]: https://github.com/sdv-dev/SDV?tab=readme-ov-file "SDV"
+[3]: https://mostly.ai "Mostly AI"
 
