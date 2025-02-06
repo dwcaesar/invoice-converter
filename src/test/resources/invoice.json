@@ -1,0 +1,36 @@
+{
+  "invoiceNumber": 123456,
+  "billingAddress": {
+    "name": "John Doe",
+    "street": "Main Street 1",
+    "city": "Sample City",
+    "zipcode": "12345"
+  },
+  "shippingAddress": {
+    "name": "John Doe",
+    "street": "Second Street 2",
+    "city": "Another City",
+    "zipcode": "67890"
+  },
+  "paymentMethod": "CREDIT_CARD",
+  "items": [
+    {
+      "name": "Product A",
+      "amount": 2,
+      "positionSum": 100.000,
+      "itemPrice": 50.00,
+      "vatType": "FULL"
+    },
+    {
+      "name": "Product B",
+      "amount": 1,
+      "itemPrice": 30.00,
+      "positionSum": 30.000,
+      "vatType": "REDUCED"
+    }
+  ],
+  "partialSumFull": 15.97,
+  "partialSumReduced": 1.96,
+  "totalSumNetto": 130.00,
+  "totalSumBrutto": 154.70
+}

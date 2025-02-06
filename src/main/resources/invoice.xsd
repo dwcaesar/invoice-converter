@@ -12,7 +12,7 @@
 
     <xs:simpleType name="method">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="credit card"/>
+            <xs:enumeration value="credit-card"/>
             <xs:enumeration value="invoice"/>
             <xs:enumeration value="surname"/>
         </xs:restriction>

@@ -1,4 +1,4 @@
-package de.dwcaesar.invoiceConverter.invoice;
+package de.dwcaesar.invoiceConverter.invoice.model;
 
 import lombok.Builder;
 import lombok.Data;
