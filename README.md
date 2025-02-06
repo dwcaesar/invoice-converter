@@ -6,7 +6,7 @@ This repo serves the purspose of exploring and demonstrating the possible applic
 
 ## Approach
 
-We want to discover possible pitfalls, limitations and emphasise advantages of AI's usage when generating test data. To illistrate pros and cons the results are compared with outcomes from some already established approaches and techniques e.g. manual creation of test datacand random test data generation.
+We want to discover possible pitfalls, limitations and emphasise advantages of AI's usage when generating test data. To illustrate pros and cons the results are compared with outcomes from some already established approaches and techniques e.g. manual creation of test data and random test data generation.
 
 We are not aiming for the completeness of our endeavour and approach.
 
