@@ -29,7 +29,7 @@ When measuring the quality of the generated test data we consider following comm
 4. Timeliness
 5. Accuracy
 6. Consistency
-7. freedom_from_redundancy
+7. Redundancy
 8. Relevance
 9. Uniformity
 10. Reliability
@@ -37,15 +37,15 @@ When measuring the quality of the generated test data we consider following comm
 Furthermore we take into account following aspects of AI as a test data genration tool
 * Avaibility
 * Integrability
-* pricing
-* licensing cost
+* Pricing
+* Licensing costs
   
 ## Conclusion
 TBD
 
 ## Sources
 
-[1]: https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html "General Data Quality Metrics"
-[2]: https://github.com/sdv-dev/SDV?tab=readme-ov-file "SDV"
-[3]: https://mostly.ai "Mostly AI"
+[1]: <https://quality.nfdi4ing.de/en/latest/general_quality/general_quality.html> "General Data Quality Metrics"
+[2]: <https://github.com/sdv-dev/SDV?tab=readme-ov-file> "SDV"
+[3]: <https://mostly.ai> "Mostly AI"
 
