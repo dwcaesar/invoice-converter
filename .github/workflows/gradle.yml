@@ -45,6 +45,16 @@ jobs:
         name: test-reports
         path: build/reports/tests/test
 
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21.x'
+    - name: Install dependecies
+      run: |
+        go get .
+    - name: buid dq tool
+      working-directory: ./tools/dq_calc
+      run: make build
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
