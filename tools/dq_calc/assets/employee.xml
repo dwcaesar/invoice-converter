@@ -1,0 +1,38 @@
+<employees>
+    <employee>
+        <id>1</id>
+        <hiredate>2020-01-01</hiredate>
+        <birthdate>2000-01-01</birthdate>
+        <email>user1@acme.com</email>
+    </employee>
+    <employee>
+        <id>2</id>
+        <hiredate>1990-01-01</hiredate>
+        <birthdate></birthdate>
+        <email>user2@acme.com</email>
+    </employee>
+    <employee>
+        <id>3</id>
+        <hiredate>1990-01-01</hiredate>
+        <birthdate>2000-01-01</birthdate>
+        <email>user3@acme.com</email>
+    </employee>
+    <employee>
+        <id>4</id>
+        <hiredate>1</hiredate>
+        <birthdate>2000-01-01</birthdate>
+        <email>user4@acme.com</email>
+    </employee>
+    <employee>
+        <id>5</id>
+        <hiredate> </hiredate>
+        <birthdate>2000-01-01</birthdate>
+        <email>user4@acme.com</email>
+    </employee>
+    <employee>
+        <id>6</id>
+        <hiredate>2005-01-01</hiredate>
+        <birthdate>1980-01-01</birthdate>
+        <email>user6@acme.com</email>
+    </employee>
+</employees>
