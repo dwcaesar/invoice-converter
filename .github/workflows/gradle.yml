@@ -49,6 +49,7 @@ jobs:
       with:
         go-version: '1.21.x'
     - name: Install dependecies
+      working-directory: ./tools/dq_calc
       run: |
         go get .
     - name: buid dq tool
