@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:complexType name="address">
+        <xs:all>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="street" type="xs:string"/>
+            <xs:element name="zip" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:simpleType name="method">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="credit-card"/>
+            <xs:enumeration value="invoice"/>
+            <xs:enumeration value="surname"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="vat">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="full"/>
+            <xs:enumeration value="reduced"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="item">
+        <xs:all>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="amount" type="xs:integer"/>
+            <xs:element name="itemPrice" type="xs:decimal">
+            </xs:element>
+            <xs:element name="vat" type="vat"/>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="invoice">
+        <xs:choice>
+            <xs:element name="invoiceNumber" type="xs:integer"/>
+            <xs:element name="billingAddress" type="address" minOccurs="0"/>
+            <xs:element name="shippingAddress" type="address"/>
+            <xs:element name="paymentMethod" type="method"/>
+            <xs:element name="item" type="item" maxOccurs="unbounded" />
+            <xs:element name="netto" type="xs:decimal"/>
+            <xs:element name="brutto" type="xs:decimal"/>
+        </xs:choice>
+    </xs:complexType>
+
+</xs:schema>
