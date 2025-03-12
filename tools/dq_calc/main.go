@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"gopkg.in/yaml.v3"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
-
-	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -44,10 +43,33 @@ type EmployeesXML struct {
 	Employees []Employee `xml:"employee"`
 }
 
+type Item struct {
+	Name      string `xml:"name"`
+	Amount    string `xml:"amount"`
+	ItemPrice string `xml:"itemPrice"`
+	Vat       string `xml:"vat"`
+}
+
+type Address struct {
+	Name   string `xml:"name"`
+	Street string `xml:"street"`
+	Zip    string `xml:"zip"`
+	City   string `xml:"city"`
+}
+
+type Invoice struct {
+	InvoiceNumber   string  `xml:"invoiceNumber"`
+	BillingAddress  Address `xml:"billingAddress"`
+	ShippingAddress Address `xml:"shippingAddress"`
+	PaymentMethod   string  `xml:"paymentMethod"`
+	Items           Item    `xml:"items"`
+	Netto           string  `xml:"netto"`
+	Brutto          string  `xml:"brutto"`
+}
+
 type InvoiceXML struct {
-	XMLName xml.Name `xml:"invoice"`
-	Netto   string   `xml:"netto"`
-	Brutto  string   `xml:"brutto"`
+	XMLName  xml.Name  `xml:"invoices"`
+	Invoices []Invoice `xml:"invoice"`
 }
 
 // checks if the email follows a given pattern
@@ -240,21 +262,22 @@ func parseEmployeeXML(filename string) ([]Employee, error) {
 	return employees.Employees, nil
 }
 
-func parseInvoiceXML(filename string) (InvoiceXML, error) {
+func parseInvoiceXML(filename string) ([]Invoice, error) {
 	// Read the XML file
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Printf("Failed to read file %s: %v\n", filename, err)
-		return InvoiceXML{}, err
+		return nil, err
 	}
 
 	// Parse the XML into the Employees struct
-	var invoice InvoiceXML
-	err = xml.Unmarshal(data, &invoice)
+	var invoices InvoiceXML
+	err = xml.Unmarshal(data, &invoices)
 	if err != nil {
 		log.Printf("Failed to parse XML in %s: %v\n", filename, err)
-		return InvoiceXML{}, err
+		return nil, err
 	}
 
-	return invoice, nil
+	log.Printf("parsed %d records", len(invoices.Invoices))
+	return invoices.Invoices, nil
 }
