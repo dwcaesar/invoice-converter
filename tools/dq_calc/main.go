@@ -44,6 +44,12 @@ type EmployeesXML struct {
 	Employees []Employee `xml:"employee"`
 }
 
+type InvoiceXML struct {
+	XMLName xml.Name `xml:"invoice"`
+	Netto   string   `xml:"netto"`
+	Brutto  string   `xml:"brutto"`
+}
+
 // checks if the email follows a given pattern
 func validateEmail(email string) bool {
 	re := regexp.MustCompile(emailPattern)
@@ -171,7 +177,7 @@ func main() {
 	// Read and parse each XML file
 	for _, file := range files {
 		log.Println("Processing file:", file)
-		if empl, err := parseXML(file); err == nil {
+		if empl, err := parseEmployeeXML(file); err == nil {
 			employees = append(employees, empl...)
 		}
 	}
@@ -214,7 +220,7 @@ func parseYamlConfig(filename string) ([]MetricConfig, error) {
 	return metricsConfig, nil
 }
 
-func parseXML(filename string) ([]Employee, error) {
+func parseEmployeeXML(filename string) ([]Employee, error) {
 	// Read the XML file
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -232,4 +238,23 @@ func parseXML(filename string) ([]Employee, error) {
 
 	log.Printf("parsed %d records", len(employees.Employees))
 	return employees.Employees, nil
+}
+
+func parseInvoiceXML(filename string) (InvoiceXML, error) {
+	// Read the XML file
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		log.Printf("Failed to read file %s: %v\n", filename, err)
+		return InvoiceXML{}, err
+	}
+
+	// Parse the XML into the Employees struct
+	var invoice InvoiceXML
+	err = xml.Unmarshal(data, &invoice)
+	if err != nil {
+		log.Printf("Failed to parse XML in %s: %v\n", filename, err)
+		return InvoiceXML{}, err
+	}
+
+	return invoice, nil
 }

@@ -75,3 +75,15 @@ func TestCalcMetricOutput(t *testing.T) {
 	value := calculateMetric(Consistency, []string{}, []map[string]string{})
 	assert.Equal(t, value, 0)
 }
+
+func TestLoadInvoiceXML(t *testing.T) {
+	invoice, err := parseInvoiceXML("assets/invoice.xml")
+
+	if err != nil {
+		t.Errorf("an error occured %s", err)
+		t.FailNow()
+	}
+
+	assert.Equal(t, invoice.Netto, "130.00")
+	assert.Equal(t, invoice.Brutto, "154.70")
+}
