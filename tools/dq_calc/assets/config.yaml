@@ -2,3 +2,24 @@
     fields: ["Birthdate", "Hiredate", "Email"]
   - id: Completeness
     fields: ["Birthdate", "Hiredate", "Email"]
+  - id: Invoice_Completeness
+    fields:
+        invoiceNumber: true
+        billingAddress:
+            - name
+            - street
+            - zip
+            - city
+        shippingAddress:
+            - name
+            - street
+            - zip
+            - city
+        paymentMethod: true
+        netto: true
+        brutto: true
+        items:
+            - name
+            - amount
+            - itemPrice
+            - vat

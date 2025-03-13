@@ -62,7 +62,7 @@ type Invoice struct {
 	BillingAddress  Address `xml:"billingAddress"`
 	ShippingAddress Address `xml:"shippingAddress"`
 	PaymentMethod   string  `xml:"paymentMethod"`
-	Items           Item    `xml:"items"`
+	Items           []Item  `xml:"items"`
 	Netto           string  `xml:"netto"`
 	Brutto          string  `xml:"brutto"`
 }
@@ -151,13 +151,13 @@ func calculateMetric(metric Metric, fields []string, records []map[string]string
 
 	validRecords := 0
 
-	vlaidationFunc, err := getCalcFunctionForMetric(metric)
+	validationFunc, err := getCalcFunctionForMetric(metric)
 	if err != nil {
 		log.Printf("coudnt determine the validation function for %s due to %s", metric, err)
 		return 0
 	}
 	for _, rec := range records {
-		if vlaidationFunc(fields, rec) {
+		if validationFunc(fields, rec) {
 			validRecords++
 		}
 	}
@@ -184,12 +184,23 @@ func convertEmployeeToMap(emp Employee) (map[string]string, error) {
 	return result, nil
 }
 
+func convertInvoiceToMap(invoice Invoice) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	jsonBytes, err := json.Marshal(invoice)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(jsonBytes, &result)
+	return result, err
+}
+
 func main() {
 	files, err := filepath.Glob("assets/*.xml")
 	if err != nil {
-		log.Println("Error finding XML files:", err)
-		return
-	} else if len(files) == 0 {
+		log.Fatalf("Error finding XML files: %v", err) // Fatalf logs the error and exits
+	}
+
+	if len(files) == 0 {
 		log.Println("No XML files found in the current folder.")
 		return
 	}
