@@ -85,3 +85,157 @@ func TestConvertInvoiceToMap(t *testing.T) {
 		assert.NotNil(t, firstItem[key], "%v does not exist in the item map", key)
 	}
 }
+
+func TestFalseInvoiceCompleteness(t *testing.T) {
+	invoice := map[string]interface{}{
+		"invoiceNumber": "123456",
+		"billingAddress": map[string]interface{}{
+			"name":   "John Doe",
+			"street": "Main Street 1",
+			"zip":    "12345",
+			"city":   "Sample City",
+		},
+	}
+	var fields = map[string]interface{}{
+		"invoiceNumber":  true,
+		"billingAddress": []interface{}{"name", "street", "zip", "city"},
+		"netto":          true,
+	}
+
+	result := validateInvoiceCompleteness(invoice, fields)
+
+	assert.False(t, result, "Expected invoice to be invalid")
+}
+
+func TestSimpleInvoiceCompleteness(t *testing.T) {
+	invoice := map[string]interface{}{
+		"invoiceNumber": "123456",
+		"billingAddress": map[string]interface{}{
+			"name":   "John Doe",
+			"street": "Main Street 1",
+			"zip":    "12345",
+			"city":   "Sample City",
+		},
+		"netto": "1000",
+	}
+	var fields = map[string]interface{}{
+		"invoiceNumber":  true,
+		"billingAddress": []interface{}{"name", "street", "zip", "city"},
+		"netto":          true,
+	}
+
+	result := validateInvoiceCompleteness(invoice, fields)
+
+	assert.True(t, result, "Expected invoice to be valid")
+}
+func TestFalseComplexInvoiceCompleteness(t *testing.T) {
+	invoice := map[string]interface{}{
+		"invoiceNumber": "123456",
+		"billingAddress": map[string]interface{}{
+			"name":   "John Doe",
+			"street": "Main Street 1",
+			"zip":    "12345",
+		},
+		"netto": "1000",
+	}
+	var fields = map[string]interface{}{
+		"invoiceNumber":  true,
+		"billingAddress": []interface{}{"name", "street", "zip", "city"},
+		"netto":          true,
+	}
+
+	result := validateInvoiceCompleteness(invoice, fields)
+
+	assert.False(t, result, "Expected invoice to be invalid")
+}
+func TestComplexInvoiceCompleteness(t *testing.T) {
+	invoice := map[string]interface{}{
+		"invoiceNumber": "123456",
+		"billingAddress": map[string]interface{}{
+			"name":   "John Doe",
+			"street": "Main Street 1",
+			"zip":    "12345",
+			"city":   "Main City",
+		},
+		"shippingAddress": map[string]interface{}{
+			"name":   "John Doe",
+			"street": "Second Street 2",
+			"zip":    "67890",
+			"city":   "Another City",
+		},
+		"paymentMethod": "credit-card",
+		"items": []interface{}{
+			map[string]interface{}{
+				"name":      "Product A",
+				"amount":    "1",
+				"itemPrice": "50.00",
+				"vat":       "full",
+			},
+			map[string]interface{}{
+				"name":      "Product B",
+				"amount":    "2",
+				"itemPrice": "80.00",
+				"vat":       "full",
+			},
+		},
+		"netto":  "1000",
+		"brutto": "154.70",
+	}
+	var fields = map[string]interface{}{
+		"invoiceNumber": true,
+		"billingAddress": []interface{}{
+			"name", "street", "zip", "city",
+		},
+		"shippingAddress": []interface{}{
+			"name", "street", "zip", "city",
+		},
+		"paymentMethod": true,
+		"items": []interface{}{
+			"name", "amount", "itemPrice", "vat",
+		},
+		"netto":  true,
+		"brutto": true,
+	}
+
+	result := validateInvoiceCompleteness(invoice, fields)
+
+	assert.True(t, result, "Expected invoice to be valid")
+}
+
+func TestFalseItemsInvoiceCompleteness(t *testing.T) {
+	invoice := map[string]interface{}{
+		"invoiceNumber": "123456",
+		"billingAddress": map[string]interface{}{
+			"name":   "John Doe",
+			"street": "Main Street 1",
+			"zip":    "12345",
+			"city":   "Main City",
+		},
+		"items": []interface{}{
+			map[string]interface{}{
+				"name":      "Product A",
+				"amount":    "1",
+				"itemPrice": "50.00",
+				"vat":       "full",
+			},
+			map[string]interface{}{
+				"name":      "Product B",
+				"amount":    "2",
+				"itemPrice": "80.00",
+			},
+		},
+	}
+	var fields = map[string]interface{}{
+		"invoiceNumber": true,
+		"billingAddress": []interface{}{
+			"name", "street", "zip", "city",
+		},
+		"items": []interface{}{
+			"name", "amount", "itemPrice", "vat",
+		},
+	}
+
+	result := validateInvoiceCompleteness(invoice, fields)
+
+	assert.False(t, result, "Expected invoice to be invalid")
+}

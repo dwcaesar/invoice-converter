@@ -91,9 +91,68 @@ func validateCompleteness(configFields map[string]interface{}, record map[string
 	return true
 }
 
-func validateInvoiceCompleteness(invoice Invoice, requiredFields []string) bool {
+func validateInvoiceCompleteness(invoiceMap map[string]interface{}, fields map[string]interface{}) bool {
 
+	for key, fieldVal := range fields {
+		invoiceValue, exists := invoiceMap[key]
+		if !exists || invoiceValue == nil {
+			log.Printf("Missing or nil: %s", key)
+			return false
+		}
+
+		switch fields := fieldVal.(type) {
+		case []interface{}:
+			if !validateComplexInvoiceCompleteness(key, invoiceValue, fields) {
+				return false
+			}
+		case bool:
+			if invoiceValue == nil || invoiceValue == "" {
+				return false
+			}
+		default:
+			log.Fatalf("config field has an unknown type: %s", fieldVal)
+		}
+	}
+	return true
+}
+
+func validateComplexInvoiceCompleteness(key string, invoiceValue interface{}, fields []interface{}) bool {
+	if invoiceSubMap, ok := invoiceValue.(map[string]interface{}); ok {
+		configSubfields := convertFielValueToFields(fields)
+		return validateInvoiceCompleteness(invoiceSubMap, configSubfields)
+	}
+
+	if list, ok := invoiceValue.([]interface{}); ok {
+		return validateListOfObjects(key, list, fields)
+	}
+
+	log.Printf("Invalid structure for field: %s\n", key)
 	return false
+}
+
+func validateListOfObjects(key string, list []interface{}, fields []interface{}) bool {
+	nestedConfig := convertFielValueToFields(fields)
+	for _, item := range list {
+		itemMap, ok := item.(map[string]interface{})
+		if !ok {
+			log.Printf("Invalid structure for list field: %s\n", key)
+			return false
+		}
+		if !validateInvoiceCompleteness(itemMap, nestedConfig) {
+			return false
+		}
+	}
+	return true
+}
+
+func convertFielValueToFields(fields []interface{}) map[string]interface{} {
+	config := make(map[string]interface{})
+	for _, field := range fields {
+		if fieldStr, ok := field.(string); ok {
+			config[fieldStr] = true
+		}
+	}
+	return config
 }
 
 // We consider Intra-record and Format Consistencies here
