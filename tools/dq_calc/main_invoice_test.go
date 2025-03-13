@@ -72,7 +72,7 @@ func TestConvertInvoiceToMap(t *testing.T) {
 	}
 
 	// Check list items
-	items, ok := invoiceMap["items"].([]interface{})
+	items, ok := invoiceMap["Items"].([]interface{})
 	require.Truef(t, ok, "Failed to convert items to a map")
 	assert.Equal(t, 2, len(items), "Expected 2 items, but got %d", len(items))
 
