@@ -1,28 +1,22 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"daquam/assert"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
-
-func TestInvoicesExist(t *testing.T) {
-	_, err := parseInvoiceXML("assets/invoices.xml")
-
-	//Fails immediately if error is returned
-	require.NoError(t, err, "Failed to parse invoices.xml")
-}
 
 func TestLoadInvoiceXML(t *testing.T) {
 	invoices, err := parseInvoiceXML("assets/invoices.xml")
-	require.NoError(t, err, "Failed to parse invoices.xml")
+	if err != nil {
+		t.Errorf("error when parsing xml %s", err)
+	}
 
-	require.NotNil(t, invoices, "Invoices should not be nil")
-	assert.Equal(t, 2, len(invoices), "invoices length not matching %s", invoices)
+	assert.Equal(t, 2, len(invoices))
 
-	for i, invoice := range invoices {
-		assert.NotNil(t, invoice, "Invoice at index %d should not be nil", i)
-		require.NotEmpty(t, invoice.InvoiceNumber, "Invoice at index %d should have an invoice number", i)
+	for _, invoice := range invoices {
+		assert.Equal(t, len(invoice.InvoiceNumber) > 0, true)
 	}
 }
 
@@ -53,13 +47,15 @@ func TestConvertInvoiceToMap(t *testing.T) {
 
 	invoiceMap, err := convertInvoiceToMap(invoice)
 	if err != nil {
-		t.Fatalf("Error converting invoice to map, %v", err)
+		t.Errorf("Error converting invoice to map, %v", err)
 	}
 
 	expectedKeys := []string{"InvoiceNumber", "BillingAddress", "ShippingAddress", "PaymentMethod", "Items", "Netto", "Brutto"}
 
 	for _, key := range expectedKeys {
-		assert.NotNil(t, invoiceMap[key], "%v does not exist in the map", key)
+		if _, exist := invoiceMap[key]; !exist {
+			t.Errorf("expected field %v does not exist in the map", key)
+		}
 	}
 
 	// Check nested fields
@@ -68,13 +64,17 @@ func TestConvertInvoiceToMap(t *testing.T) {
 
 	expectedBillingAddressKeys := []string{"Name", "Street", "Zip", "City"}
 	for _, key := range expectedBillingAddressKeys {
-		assert.NotNil(t, billingAddress[key], "%v does not exist in the billingAddress map", key)
+		if _, exist := billingAddress[key]; !exist {
+			t.Errorf("expected field %v does not exist in the map", key)
+		}
 	}
 
 	// Check list items
 	items, ok := invoiceMap["Items"].([]interface{})
-	require.Truef(t, ok, "Failed to convert items to a map")
-	assert.Equal(t, 2, len(items), "Expected 2 items, but got %d", len(items))
+	if !ok {
+		t.Error("Failed to convert items to a map")
+	}
+	assert.Equal(t, len(items), 2)
 
 	// Check item structure
 	firstItem, ok := items[0].(map[string]interface{})
@@ -82,7 +82,9 @@ func TestConvertInvoiceToMap(t *testing.T) {
 
 	expectedItemKeys := []string{"Name", "Amount", "ItemPrice", "Vat"}
 	for _, key := range expectedItemKeys {
-		assert.NotNil(t, firstItem[key], "%v does not exist in the item map", key)
+		if _, exist := firstItem[key]; !exist {
+			t.Errorf("expected field %v does not exist in the item map", key)
+		}
 	}
 }
 
@@ -104,7 +106,7 @@ func TestFalseInvoiceCompleteness(t *testing.T) {
 
 	result := validateInvoiceCompleteness(invoice, fields)
 
-	assert.False(t, result, "Expected invoice to be invalid")
+	assert.Equal(t, result, false)
 }
 
 func TestSimpleInvoiceCompleteness(t *testing.T) {
@@ -126,7 +128,7 @@ func TestSimpleInvoiceCompleteness(t *testing.T) {
 
 	result := validateInvoiceCompleteness(invoice, fields)
 
-	assert.True(t, result, "Expected invoice to be valid")
+	assert.Equal(t, result, true)
 }
 func TestFalseComplexInvoiceCompleteness(t *testing.T) {
 	invoice := map[string]interface{}{
@@ -146,7 +148,7 @@ func TestFalseComplexInvoiceCompleteness(t *testing.T) {
 
 	result := validateInvoiceCompleteness(invoice, fields)
 
-	assert.False(t, result, "Expected invoice to be invalid")
+	assert.Equal(t, result, false)
 }
 func TestComplexInvoiceCompleteness(t *testing.T) {
 	invoice := map[string]interface{}{
@@ -199,7 +201,7 @@ func TestComplexInvoiceCompleteness(t *testing.T) {
 
 	result := validateInvoiceCompleteness(invoice, fields)
 
-	assert.True(t, result, "Expected invoice to be valid")
+	assert.Equal(t, result, true)
 }
 
 func TestFalseItemsInvoiceCompleteness(t *testing.T) {
@@ -237,5 +239,5 @@ func TestFalseItemsInvoiceCompleteness(t *testing.T) {
 
 	result := validateInvoiceCompleteness(invoice, fields)
 
-	assert.False(t, result, "Expected invoice to be invalid")
+	assert.Equal(t, result, false)
 }
