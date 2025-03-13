@@ -1,4 +1,31 @@
   - id: Consistency
-    fields: ["Birthdate", "Hiredate", "Email"]
+    fields:
+        Birthdate: true
+        Hiredate: true
+        Email: true
   - id: Completeness
-    fields: ["Birthdate", "Hiredate", "Email"]
+    fields:
+        Birthdate: true
+        Hiredate: true
+        Email: true
+  - id: Invoice_Completeness
+    fields:
+        invoiceNumber: true
+        billingAddress:
+            - name
+            - street
+            - zip
+            - city
+        shippingAddress:
+            - name
+            - street
+            - zip
+            - city
+        paymentMethod: true
+        netto: true
+        brutto: true
+        items:
+            - name
+            - amount
+            - itemPrice
+            - vat
