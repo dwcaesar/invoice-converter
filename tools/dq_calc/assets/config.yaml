@@ -1,7 +1,13 @@
   - id: Consistency
-    fields: ["Birthdate", "Hiredate", "Email"]
+    fields:
+        Birthdate: true
+        Hiredate: true
+        Email: true
   - id: Completeness
-    fields: ["Birthdate", "Hiredate", "Email"]
+    fields:
+        Birthdate: true
+        Hiredate: true
+        Email: true
   - id: Invoice_Completeness
     fields:
         invoiceNumber: true

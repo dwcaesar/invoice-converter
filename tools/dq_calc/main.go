@@ -21,13 +21,14 @@ const (
 type Metric string
 
 const (
-	Completeness Metric = "Completeness"
-	Consistency  Metric = "Consistency"
+	InvoiceCompleteness Metric = "Invoice_Completeness"
+	Completeness        Metric = "Completeness"
+	Consistency         Metric = "Consistency"
 )
 
 type MetricConfig struct {
-	Id     Metric   `yaml:"id"`
-	Fields []string `yaml:"fields"`
+	Id     Metric                 `yaml:"id"`
+	Fields map[string]interface{} `yaml:"fields"`
 }
 
 // Employee struct to hold sample data
@@ -79,8 +80,9 @@ func validateEmail(email string) bool {
 }
 
 // Completeness is given when all value are set and not empty
-func validateCompleteness(fields []string, record map[string]string) bool {
-	for _, field := range fields {
+func validateCompleteness(configFields map[string]interface{}, record map[string]string) bool {
+
+	for field := range configFields {
 		value, exists := record[field]
 		if !exists || len(strings.TrimSpace(value)) == 0 {
 			return false
@@ -89,10 +91,15 @@ func validateCompleteness(fields []string, record map[string]string) bool {
 	return true
 }
 
-// We considfer Intra-record and Format Consistenies here
-func validateConsistency(fields []string, record map[string]string) bool {
+func validateInvoiceCompleteness(invoice Invoice, requiredFields []string) bool {
 
-	for _, field := range fields {
+	return false
+}
+
+// We consider Intra-record and Format Consistencies here
+func validateConsistency(configFields map[string]interface{}, record map[string]string) bool {
+
+	for field := range configFields {
 		value, exists := record[field]
 
 		if !exists {
@@ -131,8 +138,10 @@ func validateHiredateBirthdateConsistency(record map[string]string) bool {
 	return err1 == nil && err2 == nil && birth.Before(hire)
 }
 
-func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]string) bool, error) {
+func getCalcFunctionForMetric(metric Metric) (func(fields map[string]interface{}, record map[string]string) bool, error) {
 	switch metric {
+	case InvoiceCompleteness:
+		return validateCompleteness, nil
 	case Completeness:
 		return validateCompleteness, nil
 	case Consistency:
@@ -142,7 +151,7 @@ func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[s
 	}
 }
 
-func calculateMetric(metric Metric, fields []string, records []map[string]string) float64 {
+func calculateMetric(metric Metric, fields map[string]interface{}, records []map[string]string) float64 {
 	totalRecords := len(records)
 	if totalRecords == 0 {
 		log.Println("empty employees array")
@@ -195,7 +204,7 @@ func convertInvoiceToMap(invoice Invoice) (map[string]interface{}, error) {
 }
 
 func main() {
-	files, err := filepath.Glob("assets/*.xml")
+	files, err := filepath.Glob("assets/emp*.xml")
 	if err != nil {
 		log.Fatalf("Error finding XML files: %v", err) // Fatalf logs the error and exits
 	}

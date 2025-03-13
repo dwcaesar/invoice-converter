@@ -12,7 +12,7 @@ func TestEmailOk(t *testing.T) {
 	assert.Equal(t, value, true)
 }
 
-func TestEmailFaild(t *testing.T) {
+func TestEmailFailed(t *testing.T) {
 	var testString = "2/@test.de"
 
 	value := validateEmail(testString)
@@ -41,7 +41,8 @@ func TestFalseCompleteness(t *testing.T) {
 			Email:     "f",
 		},
 	}
-	var fields = []string{"X", "Hiredate"}
+	var fields = map[string]interface{}{"X": true, "Hiredate": true}
+
 	for _, emp := range emps {
 		data, err := convertEmployeeToMap(emp)
 		if err != nil {
@@ -62,7 +63,7 @@ func TestTrueCompleteness(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	value := validateCompleteness([]string{}, data)
+	value := validateCompleteness(map[string]interface{}{}, data)
 	assert.Equal(t, value, true)
 }
 
@@ -72,6 +73,6 @@ func TestCalcMetricEmptyInput(t *testing.T) {
 }
 
 func TestCalcMetricOutput(t *testing.T) {
-	value := calculateMetric(Consistency, []string{}, []map[string]string{})
+	value := calculateMetric(Consistency, map[string]interface{}{}, []map[string]string{})
 	assert.Equal(t, value, 0)
 }
