@@ -6,6 +6,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -17,4 +18,5 @@ private BigInteger invoiceNumber;
     private List<Item> items;
     private BigDecimal netto;
     private BigDecimal brutto;
+    private Map<Vat, BigDecimal> vat;
 }

@@ -43,6 +43,16 @@
       },
       "required": ["name", "amount", "itemPrice", "positionSum", "vatType"],
       "additionalProperties": false
+    },
+    "vatRates": {
+      "full": {
+        "type": "number"
+      },
+      "reduced": {
+        "type": "number"
+      },
+      "required": ["full", "reduced"],
+      "additionalProperties": false
     }
   },
   "type": "object",
@@ -81,8 +91,12 @@
     },
     "totalSumBrutto": {
       "type": "number"
+    },
+    "vatRates": {
+      "type": "object",
+      "$ref": "#/definitions/vatRates"
     }
   },
-  "required": ["billingAddress", "invoiceAddress", "invoiceNumber", "items", "partialSumFull", "partialSumReduced", "paymentMethod", "totalSumBrutto", "totalSumNetto"],
+  "required": ["billingAddress", "invoiceAddress", "invoiceNumber", "items", "partialSumFull", "partialSumReduced", "paymentMethod", "totalSumBrutto", "totalSumNetto", "vatRates"],
   "additionalProperties": false
 }
