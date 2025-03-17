@@ -1,0 +1,4 @@
+  - id: Consistency
+    fields: ["Birthdate", "Hiredate", "Email"]
+  - id: Completeness
+    fields: ["Birthdate", "Hiredate", "Email"]
