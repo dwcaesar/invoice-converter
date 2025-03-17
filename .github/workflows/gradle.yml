@@ -48,19 +48,33 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.21.x'
-    - name: Install dependecies
+    - name: Install dq dependencies
       working-directory: ./tools/dq_calc
       run: |
         go get .
-    - name: buid dq tool
+    - name: build dq tool
       working-directory: ./tools/dq_calc
       run: make build
+    - name: Install gc dependencies
+      working-directory: ./tools/generator_client
+      run: |
+        go get .
+    - name: build gc tool
+      working-directory: ./tools/generator_client
+      run: make build
 
-    - name: archive executables
+    - name: archive dq executables
       uses: actions/upload-artifact@v4
       with:
         name: executables
         path: tools/dq_calc/builds/
+        overwrite: true
+        retention-days: 5
+    - name: archive gc executables
+      uses: actions/upload-artifact@v4
+      with:
+        name: executables
+        path: tools/generator_client/builds/
         overwrite: true
         retention-days: 5
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
