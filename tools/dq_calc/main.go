@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"gopkg.in/yaml.v3"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
-	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -27,21 +29,8 @@ const (
 )
 
 type MetricConfig struct {
-	Id     Metric                 `yaml:"id"`
-	Fields map[string]interface{} `yaml:"fields"`
-}
-
-// Employee struct to hold sample data
-type Employee struct {
-	Id        string `xml:"id"`
-	Birthdate string `xml:"birthdate"`
-	Hiredate  string `xml:"hiredate"`
-	Email     string `xml:"email"`
-}
-
-type EmployeesXML struct {
-	XMLName   xml.Name   `xml:"employees"`
-	Employees []Employee `xml:"employee"`
+	Id     Metric   `yaml:"id"`
+	Fields []string `yaml:"fields"`
 }
 
 type Item struct {
@@ -59,18 +48,14 @@ type Address struct {
 }
 
 type Invoice struct {
-	InvoiceNumber   string  `xml:"invoiceNumber"`
-	BillingAddress  Address `xml:"billingAddress"`
-	ShippingAddress Address `xml:"shippingAddress"`
-	PaymentMethod   string  `xml:"paymentMethod"`
-	Items           []Item  `xml:"items"`
-	Netto           string  `xml:"netto"`
-	Brutto          string  `xml:"brutto"`
-}
-
-type InvoiceXML struct {
-	XMLName  xml.Name  `xml:"invoices"`
-	Invoices []Invoice `xml:"invoice"`
+	XMLName         xml.Name `xml:"invoice"`
+	InvoiceNumber   string   `xml:"invoiceNumber"`
+	BillingAddress  Address  `xml:"billingAddress"`
+	ShippingAddress Address  `xml:"shippingAddress"`
+	PaymentMethod   string   `xml:"paymentMethod"`
+	Items           []Item   `xml:"items"`
+	Netto           string   `xml:"netto"`
+	Brutto          string   `xml:"brutto"`
 }
 
 // checks if the email follows a given pattern
@@ -79,86 +64,92 @@ func validateEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-// Completeness is given when all value are set and not empty
-func validateCompleteness(configFields map[string]interface{}, record map[string]string) bool {
+func isAddressComplete(rec interface{}) bool {
+	fields := [4]string{"City", "Zip", "Street", "Name"}
 
-	for field := range configFields {
-		value, exists := record[field]
-		if !exists || len(strings.TrimSpace(value)) == 0 {
+	return isSimpleRecordComplete(fields[:], rec)
+}
+
+func isItemsComplete(rec interface{}) bool {
+	items, isConverted := rec.([]Item)
+	if !isConverted {
+		return false
+	}
+
+	fields := [4]string{"Name", "Amount", "Vat", "ItemPrice"}
+	for _, item := range items {
+		if !isSimpleRecordComplete(fields[:], item) {
 			return false
 		}
 	}
+
+	return true
+}
+func isSimpleRecordComplete(requiredFields []string, record interface{}) bool {
+	var result map[string]string
+	jsonBytes, err := json.Marshal(record)
+	if err != nil {
+		return false
+	}
+	if err := json.Unmarshal(jsonBytes, &result); err != nil {
+		return false
+	}
+
+	for _, f := range requiredFields {
+		if v, exist := result[f]; exist {
+			str := strings.TrimSpace(v)
+			if len(str) == 0 {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+
 	return true
 }
 
-func validateInvoiceCompleteness(invoiceMap map[string]interface{}, fields map[string]interface{}) bool {
+// Completeness is given when all value are set and not empty
+func validateInvoiceCompleteness(fields []string, record map[string]interface{}) bool {
 
-	for key, fieldVal := range fields {
-		invoiceValue, exists := invoiceMap[key]
-		if !exists || invoiceValue == nil {
-			log.Printf("Missing or nil: %s", key)
+	for _, field := range fields {
+		value, exists := record[field]
+		if !exists || value == nil {
+			log.Default().Printf("field %s is not set", field)
 			return false
 		}
 
-		switch fields := fieldVal.(type) {
-		case []interface{}:
-			if !validateComplexInvoiceCompleteness(key, invoiceValue, fields) {
+		switch field {
+		case "BillingAddress", "ShippingAddress":
+			if !isAddressComplete(value) {
 				return false
 			}
-		case bool:
-			if invoiceValue == nil || invoiceValue == "" {
+		case "Items":
+			if !isItemsComplete(value) {
 				return false
 			}
 		default:
-			log.Fatalf("config field has an unknown type: %s", fieldVal)
+			str := strings.TrimSpace(fmt.Sprintf("%s", value))
+			if len(str) == 0 {
+				return false
+			}
 		}
 	}
 	return true
 }
 
-func validateComplexInvoiceCompleteness(key string, invoiceValue interface{}, fields []interface{}) bool {
-	if invoiceSubMap, ok := invoiceValue.(map[string]interface{}); ok {
-		configSubfields := convertFielValueToFields(fields)
-		return validateInvoiceCompleteness(invoiceSubMap, configSubfields)
+func isPriceValueConsistent(price string) bool {
+	if _, err := strconv.ParseFloat(price, 64); err == nil {
+		var spiltByDec = strings.Split(price, ".")
+		return len(spiltByDec) == 2 && len(spiltByDec[1]) >= 2
 	}
 
-	if list, ok := invoiceValue.([]interface{}); ok {
-		return validateListOfObjects(key, list, fields)
-	}
-
-	log.Printf("Invalid structure for field: %s\n", key)
 	return false
 }
 
-func validateListOfObjects(key string, list []interface{}, fields []interface{}) bool {
-	nestedConfig := convertFielValueToFields(fields)
-	for _, item := range list {
-		itemMap, ok := item.(map[string]interface{})
-		if !ok {
-			log.Printf("Invalid structure for list field: %s\n", key)
-			return false
-		}
-		if !validateInvoiceCompleteness(itemMap, nestedConfig) {
-			return false
-		}
-	}
-	return true
-}
-
-func convertFielValueToFields(fields []interface{}) map[string]interface{} {
-	config := make(map[string]interface{})
-	for _, field := range fields {
-		if fieldStr, ok := field.(string); ok {
-			config[fieldStr] = true
-		}
-	}
-	return config
-}
-
 // We consider Intra-record and Format Consistencies here
-func validateConsistency(configFields map[string]interface{}, record map[string]string) bool {
-
-	for field := range configFields {
+func validateInvoiceConsistency(fields []string, record map[string]interface{}) bool {
+	for _, field := range fields {
 		value, exists := record[field]
 
 		if !exists {
@@ -166,51 +157,31 @@ func validateConsistency(configFields map[string]interface{}, record map[string]
 		}
 
 		switch field {
-		case "Email":
-			if !validateEmail(value) {
-				return false
+		case "Brutto", "Netto":
+			if parsedValue, ok := value.(string); ok {
+				return isPriceValueConsistent(parsedValue)
 			}
-		case "Birthdate":
-			if !validateHiredateBirthdateConsistency(record) {
-				return false
-			}
-		case "Hiredate":
-			if !validateHiredateBirthdateConsistency(record) {
-				return false
-			}
+		default:
+			return false
 		}
 	}
-	return true
+	return false
 }
 
-func validateHiredateBirthdateConsistency(record map[string]string) bool {
-	valueHire, existsHire := record["Hiredate"]
-	valueBirth, existsBirth := record["Birthdate"]
-
-	if !existsBirth || !existsHire {
-		return false
-	}
-
-	birth, err1 := time.Parse(layoutISO, valueBirth)
-	hire, err2 := time.Parse(layoutISO, valueHire)
-
-	return err1 == nil && err2 == nil && birth.Before(hire)
-}
-
-func getCalcFunctionForMetric(metric Metric) (func(fields map[string]interface{}, record map[string]string) bool, error) {
+func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]interface{}) bool, error) {
 	switch metric {
 	case InvoiceCompleteness:
-		return validateCompleteness, nil
+		return validateInvoiceCompleteness, nil
 	case Completeness:
-		return validateCompleteness, nil
+		return validateInvoiceCompleteness, nil
 	case Consistency:
-		return validateConsistency, nil
+		return validateInvoiceConsistency, nil
 	default:
 		return nil, errors.New("unexected metric")
 	}
 }
 
-func calculateMetric(metric Metric, fields map[string]interface{}, records []map[string]string) float64 {
+func calculateMetric(metric Metric, fields []string, records []map[string]interface{}) float64 {
 	totalRecords := len(records)
 	if totalRecords == 0 {
 		log.Println("empty employees array")
@@ -235,23 +206,6 @@ func calculateMetric(metric Metric, fields map[string]interface{}, records []map
 	return float64(validRecords) / float64(totalRecords)
 }
 
-// Metric value calculated as metric = validRecords / totalRecords.
-// Determine the amount of valid records by applying validationRecordFunc to every record in []Employee
-func convertEmployeeToMap(emp Employee) (map[string]string, error) {
-	var result map[string]string
-	jsonBytes, err := json.Marshal(emp)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if err = json.Unmarshal(jsonBytes, &result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
 func convertInvoiceToMap(invoice Invoice) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	jsonBytes, err := json.Marshal(invoice)
@@ -263,7 +217,7 @@ func convertInvoiceToMap(invoice Invoice) (map[string]interface{}, error) {
 }
 
 func main() {
-	files, err := filepath.Glob("assets/emp*.xml")
+	files, err := filepath.Glob("assets/invoice*.xml")
 	if err != nil {
 		log.Fatalf("Error finding XML files: %v", err) // Fatalf logs the error and exits
 	}
@@ -273,21 +227,21 @@ func main() {
 		return
 	}
 
-	var employees []Employee
+	var invoices []Invoice
 
 	// Read and parse each XML file
 	for _, file := range files {
 		log.Println("Processing file:", file)
-		if empl, err := parseEmployeeXML(file); err == nil {
-			employees = append(employees, empl...)
+		if inv, err := parseInvoiceXML(file); err == nil {
+			invoices = append(invoices, inv)
 		}
 	}
 
-	var employeesMap []map[string]string
+	var invoiceRecords []map[string]interface{}
 
-	for _, emp := range employees {
-		if result, err := convertEmployeeToMap(emp); err == nil {
-			employeesMap = append(employeesMap, result)
+	for _, i := range invoices {
+		if result, err := convertInvoiceToMap(i); err == nil {
+			invoiceRecords = append(invoiceRecords, result)
 		}
 	}
 
@@ -297,7 +251,7 @@ func main() {
 	}
 
 	for _, conf := range config {
-		metricValue := calculateMetric(conf.Id, conf.Fields, employeesMap) * 100
+		metricValue := calculateMetric(conf.Id, conf.Fields, invoiceRecords) * 100
 		log.Printf("Metric %s: %.2f%%\n", conf.Id, metricValue)
 	}
 }
@@ -321,42 +275,22 @@ func parseYamlConfig(filename string) ([]MetricConfig, error) {
 	return metricsConfig, nil
 }
 
-func parseEmployeeXML(filename string) ([]Employee, error) {
+func parseInvoiceXML(filename string) (Invoice, error) {
 	// Read the XML file
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Printf("Failed to read file %s: %v\n", filename, err)
-		return nil, err
+		return Invoice{}, err
 	}
 
 	// Parse the XML into the Employees struct
-	var employees EmployeesXML
-	err = xml.Unmarshal(data, &employees)
+	var invoice Invoice
+	err = xml.Unmarshal(data, &invoice)
 	if err != nil {
 		log.Printf("Failed to parse XML in %s: %v\n", filename, err)
-		return nil, err
+		return Invoice{}, err
 	}
 
-	log.Printf("parsed %d records", len(employees.Employees))
-	return employees.Employees, nil
-}
-
-func parseInvoiceXML(filename string) ([]Invoice, error) {
-	// Read the XML file
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		log.Printf("Failed to read file %s: %v\n", filename, err)
-		return nil, err
-	}
-
-	// Parse the XML into the Employees struct
-	var invoices InvoiceXML
-	err = xml.Unmarshal(data, &invoices)
-	if err != nil {
-		log.Printf("Failed to parse XML in %s: %v\n", filename, err)
-		return nil, err
-	}
-
-	log.Printf("parsed %d records", len(invoices.Invoices))
-	return invoices.Invoices, nil
+	log.Printf("read invoice %s", invoice)
+	return invoice, nil
 }
