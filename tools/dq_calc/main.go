@@ -23,9 +23,8 @@ const (
 type Metric string
 
 const (
-	InvoiceCompleteness Metric = "Invoice_Completeness"
-	Completeness        Metric = "Completeness"
-	Consistency         Metric = "Consistency"
+	Completeness Metric = "Completeness"
+	Consistency  Metric = "Consistency"
 )
 
 type MetricConfig struct {
@@ -89,19 +88,21 @@ func isSimpleRecordComplete(requiredFields []string, record interface{}) bool {
 	var result map[string]string
 	jsonBytes, err := json.Marshal(record)
 	if err != nil {
-		return false
+		panic(err)
 	}
 	if err := json.Unmarshal(jsonBytes, &result); err != nil {
-		return false
+		panic(err)
 	}
 
 	for _, f := range requiredFields {
 		if v, exist := result[f]; exist {
 			str := strings.TrimSpace(v)
 			if len(str) == 0 {
+				log.Default().Printf("the record's field %s was incomplete", f)
 				return false
 			}
 		} else {
+			log.Default().Printf("the record's field %s not existing", f)
 			return false
 		}
 	}
@@ -115,22 +116,25 @@ func validateInvoiceCompleteness(fields []string, record map[string]interface{})
 	for _, field := range fields {
 		value, exists := record[field]
 		if !exists || value == nil {
-			log.Default().Printf("field %s is not set", field)
+			log.Default().Printf("the record's field %s was incomplete", field)
 			return false
 		}
 
 		switch field {
 		case "BillingAddress", "ShippingAddress":
 			if !isAddressComplete(value) {
+				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		case "Items":
 			if !isItemsComplete(value) {
+				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		default:
 			str := strings.TrimSpace(fmt.Sprintf("%s", value))
 			if len(str) == 0 {
+				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		}
@@ -170,8 +174,6 @@ func validateInvoiceConsistency(fields []string, record map[string]interface{}) 
 
 func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]interface{}) bool, error) {
 	switch metric {
-	case InvoiceCompleteness:
-		return validateInvoiceCompleteness, nil
 	case Completeness:
 		return validateInvoiceCompleteness, nil
 	case Consistency:

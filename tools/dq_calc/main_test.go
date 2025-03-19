@@ -122,7 +122,7 @@ func TestFalseAddressCompletness(t *testing.T) {
 func TestTrueSimpleRecordCompletness(t *testing.T) {
 	record := map[string]string{"key1": "value1", "key2": "value2"}
 
-	assert.Equal(t, isSimpleRecordComplete([]string{"key1", "key2", "key3"}, record), true)
+	assert.Equal(t, isSimpleRecordComplete([]string{"key1", "key2"}, record), true)
 }
 
 func TestFalseRecordCompletness(t *testing.T) {

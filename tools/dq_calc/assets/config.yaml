@@ -1,2 +1,2 @@
-  - id: Invoice_Completeness
-    fields: ["InvoiceNumber", "Netto", "Brutto", "BillingAddress"]
+  - id: Completeness
+    fields: ["InvoiceNumber", "Netto", "Brutto", "BillingAddress", "ShippingAddress", "Items"]
