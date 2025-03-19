@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"io"
+	"main/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -27,15 +27,16 @@ func TestBuildRequestBody(t *testing.T) {
 
 	actual := BuildRequestBody(config)
 
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, actual, expected)
 }
 
 func TestQueryGenerator(t *testing.T) {
-	jsonBytes, _ := json.Marshal(RequestBody{
+	request := RequestBody{
 		Model:  "model",
 		Prompt: "some test data",
 		Stream: false,
-	})
+	}
+	jsonBytes, _ := json.Marshal(request)
 	expected := LlmResponse{
 		Model:      "model",
 		CreatedAt:  time.Now().Format(time.RFC3339),
@@ -58,7 +59,9 @@ func TestQueryGenerator(t *testing.T) {
 		}
 		if r.Body != nil {
 			requestBytes, _ := io.ReadAll(r.Body)
-			assert.Equal(t, jsonBytes, requestBytes)
+			var requestBody RequestBody
+			_ = json.Unmarshal(requestBytes, &requestBody)
+			assert.Equal(t, requestBody, request)
 		}
 		w.WriteHeader(http.StatusOK)
 		responseBytes, _ := json.Marshal(expected)
@@ -77,7 +80,7 @@ func TestQueryGenerator(t *testing.T) {
 
 	actual, _ := QueryGenerator(&http.Client{}, config, jsonBytes)
 
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, actual, expected)
 }
 
 func TestReadConfig(t *testing.T) {
@@ -93,7 +96,7 @@ func TestReadConfig(t *testing.T) {
 
 	actual := ReadConfig("./testdata/config.yml")
 
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, actual, expected)
 }
 
 func TestWriteResponseToFile(t *testing.T) {
@@ -112,9 +115,12 @@ func TestWriteResponseToFile(t *testing.T) {
 
 	err := WriteResponseToFile(response, tempFile.Name())
 
-	assert.Nil(t, err)
-
+	if err != nil {
+		t.Error(err)
+	}
 	rawContent, err := os.ReadFile(tempFile.Name())
-	assert.Nil(t, err)
-	assert.Equal(t, response.Response, string(rawContent))
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, string(rawContent), response.Response)
 }

@@ -81,6 +81,9 @@ func QueryGenerator(client *http.Client, config GeneratorConfig, jsonBytes []byt
 	if err != nil {
 		log.Fatalf("Failed to post: %v", err)
 	}
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 	if resp.StatusCode != 200 {
 		if resp.ContentLength > 0 {
 			bodyBytes, _ := io.ReadAll(resp.Body)
