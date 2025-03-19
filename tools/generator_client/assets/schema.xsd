@@ -10,6 +10,13 @@
         </xs:all>
     </xs:complexType>
 
+    <xs:complexType name="vatRates">
+        <xs:choice>
+            <xs:element name="full" type="xs:decimal"/>
+            <xs:element name="reduced" type="xs:decimal"/>
+        </xs:choice>
+    </xs:complexType>
+
     <xs:simpleType name="method">
         <xs:restriction base="xs:string">
             <xs:enumeration value="credit-card"/>
@@ -30,8 +37,7 @@
         <xs:all>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="amount" type="xs:integer"/>
-            <xs:element name="itemPrice" type="xs:decimal">
-            </xs:element>
+            <xs:element name="itemPrice" type="xs:decimal"/>
             <xs:element name="vat" type="vat"/>
         </xs:all>
     </xs:complexType>
@@ -45,6 +51,7 @@
             <xs:element name="item" type="item" maxOccurs="unbounded" />
             <xs:element name="netto" type="xs:decimal"/>
             <xs:element name="brutto" type="xs:decimal"/>
+            <xs:element name="vat" type="vatRates"/>
         </xs:choice>
     </xs:complexType>
 
