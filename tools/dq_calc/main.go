@@ -14,11 +14,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const (
-	layoutISO    = "2006-01-02"
-	emailPattern = `^[\w\.-]+@[\w\.-]+\.\w+$`
-)
-
 type Metric string
 
 const (
