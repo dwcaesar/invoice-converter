@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -52,7 +53,7 @@ type Invoice struct {
 	BillingAddress  Address  `xml:"billingAddress"`
 	ShippingAddress Address  `xml:"shippingAddress"`
 	PaymentMethod   string   `xml:"paymentMethod"`
-	Items           []Item   `xml:"items"`
+	Items           []Item   `xml:"items>item"`
 	Netto           string   `xml:"netto"`
 	Brutto          string   `xml:"brutto"`
 }
@@ -70,8 +71,9 @@ func isAddressComplete(rec interface{}) bool {
 }
 
 func isItemsComplete(rec interface{}) bool {
-	items, isConverted := rec.([]Item)
+	items, isConverted := rec.([]interface{})
 	if !isConverted {
+		log.Panicf("cannot convert %s", reflect.TypeOf(rec))
 		return false
 	}
 

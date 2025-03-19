@@ -1,2 +1,4 @@
   - id: Completeness
     fields: ["InvoiceNumber", "Netto", "Brutto", "BillingAddress", "ShippingAddress", "Items"]
+  - id: Consistency
+    fields: [ "Netto", "Brutto"]

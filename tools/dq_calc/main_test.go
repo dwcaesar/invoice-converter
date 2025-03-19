@@ -3,6 +3,7 @@ package main
 import (
 	"daquam/assert"
 	"encoding/json"
+	"log"
 	"testing"
 )
 
@@ -78,15 +79,36 @@ func TestFalseInvoiceCompleteness(t *testing.T) {
 func TestTrueItemsCompleteness(t *testing.T) {
 	items := []Item{{ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}, {ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}}
 
-	assert.Equal(t, isItemsComplete(items), true)
+	records := marshalItems(items)
+	assert.Equal(t, isItemsComplete(records), true)
 }
 
+func marshalItems(items []Item) []interface{} {
+	var records []interface{}
+
+	for _, item := range items {
+		var record map[string]interface{}
+		if bytes, err := json.Marshal(item); err == nil {
+			if err := json.Unmarshal(bytes, &record); err == nil {
+				records = append(records, record)
+			} else {
+				log.Fatalf("error %s", err)
+			}
+		} else {
+			log.Fatalf("error %s", err)
+		}
+	}
+
+	return records
+}
 func TestFalseItemsCompleteness(t *testing.T) {
 	items := []Item{{ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}, {ItemPrice: " ", Amount: "s", Vat: "v", Name: "n"}}
-	assert.Equal(t, isItemsComplete(items), false)
+	records := marshalItems(items)
+	assert.Equal(t, isItemsComplete(records), false)
 
 	items = []Item{{ItemPrice: "a", Vat: "v", Name: "n"}, {ItemPrice: "i", Amount: "s", Vat: "v", Name: "n"}}
-	assert.Equal(t, isItemsComplete(items), false)
+	records = marshalItems(items)
+	assert.Equal(t, isItemsComplete(records), false)
 }
 
 func TestTrueAddressCompletness(t *testing.T) {
@@ -160,18 +182,18 @@ func TestTrueAdressCompleteness(t *testing.T) {
 	assert.Equal(t, isAddressComplete(adress), true)
 }
 
-func convertAdressToMap(adr Address) (map[string]interface{}, error) {
-	var adress map[string]interface{}
-	jsonBytes, err := json.Marshal(adr)
+func convertAdressToMap(object interface{}) (map[string]interface{}, error) {
+	var record map[string]interface{}
+	jsonBytes, err := json.Marshal(object)
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(jsonBytes, &adress)
+	err = json.Unmarshal(jsonBytes, &record)
 	if err != nil {
 		return nil, err
 	}
 
-	return adress, nil
+	return record, nil
 }
 
 func TestCalcMetricEmptyInput(t *testing.T) {
