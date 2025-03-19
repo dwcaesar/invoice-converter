@@ -1,6 +1,7 @@
 package main
 
 import (
+	"daquam/metric"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -8,9 +9,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"reflect"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -58,60 +56,6 @@ type Invoice struct {
 	Brutto          string   `xml:"brutto"`
 }
 
-// checks if the email follows a given pattern
-func validateEmail(email string) bool {
-	re := regexp.MustCompile(emailPattern)
-	return re.MatchString(email)
-}
-
-func isAddressComplete(rec interface{}) bool {
-	fields := [4]string{"City", "Zip", "Street", "Name"}
-
-	return isSimpleRecordComplete(fields[:], rec)
-}
-
-func isItemsComplete(rec interface{}) bool {
-	items, isConverted := rec.([]interface{})
-	if !isConverted {
-		log.Panicf("cannot convert %s", reflect.TypeOf(rec))
-		return false
-	}
-
-	fields := [4]string{"Name", "Amount", "Vat", "ItemPrice"}
-	for _, item := range items {
-		if !isSimpleRecordComplete(fields[:], item) {
-			return false
-		}
-	}
-
-	return true
-}
-func isSimpleRecordComplete(requiredFields []string, record interface{}) bool {
-	var result map[string]string
-	jsonBytes, err := json.Marshal(record)
-	if err != nil {
-		panic(err)
-	}
-	if err := json.Unmarshal(jsonBytes, &result); err != nil {
-		panic(err)
-	}
-
-	for _, f := range requiredFields {
-		if v, exist := result[f]; exist {
-			str := strings.TrimSpace(v)
-			if len(str) == 0 {
-				log.Default().Printf("the record's field %s was incomplete", f)
-				return false
-			}
-		} else {
-			log.Default().Printf("the record's field %s not existing", f)
-			return false
-		}
-	}
-
-	return true
-}
-
 // Completeness is given when all value are set and not empty
 func validateInvoiceCompleteness(fields []string, record map[string]interface{}) bool {
 
@@ -124,12 +68,12 @@ func validateInvoiceCompleteness(fields []string, record map[string]interface{})
 
 		switch field {
 		case "BillingAddress", "ShippingAddress":
-			if !isAddressComplete(value) {
+			if !metric.IsAddressComplete(value) {
 				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		case "Items":
-			if !isItemsComplete(value) {
+			if !metric.IsItemsComplete(value) {
 				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
@@ -144,34 +88,23 @@ func validateInvoiceCompleteness(fields []string, record map[string]interface{})
 	return true
 }
 
-func isPriceValueConsistent(price string) bool {
-	if _, err := strconv.ParseFloat(price, 64); err == nil {
-		var spiltByDec = strings.Split(price, ".")
-		return len(spiltByDec) == 2 && len(spiltByDec[1]) >= 2
-	}
-
-	return false
-}
-
 // We consider Intra-record and Format Consistencies here
 func validateInvoiceConsistency(fields []string, record map[string]interface{}) bool {
 	for _, field := range fields {
-		value, exists := record[field]
-
-		if !exists {
-			return false
-		}
-
 		switch field {
 		case "Brutto", "Netto":
-			if parsedValue, ok := value.(string); ok {
-				return isPriceValueConsistent(parsedValue)
+			if !metric.IsBruttoNettoConsistent(record) {
+				return false
+			}
+		case "Items":
+			if !metric.IsNettoPriceConsistent(record) {
+				return false
 			}
 		default:
 			return false
 		}
 	}
-	return false
+	return true
 }
 
 func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]interface{}) bool, error) {
