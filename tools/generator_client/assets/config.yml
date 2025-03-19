@@ -1,0 +1,14 @@
+---
+  target_directory: './generated'
+  max_count_files: 1
+  prompt_template: 'You are a test data generator.
+  You generate one XML document specified by the XSD schema delimited by three hashes.
+  Before answering make sure, that your response only contains one XML document and that that document fully complies with the XSD schema delimited by three hashes.
+  Your response will be consumed by a downstream system, therefore it must not contain any markup.
+  ###
+  <schema>
+  ###'
+  placeholder_schema: '<schema>'
+  filepath_schema: './assets/schema.xsd'
+  model_to_use: 'phi3'
+  llm_url: 'http://localhost:11434/api/generate'

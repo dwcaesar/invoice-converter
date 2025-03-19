@@ -1,0 +1,11 @@
+---
+  target_directory: './generated'
+  max_count_files: 5
+  prompt_template: 'This is a test case
+  ###
+  <schema>
+  ###'
+  placeholder_schema: '<schema>'
+  filepath_schema: './testdata/schema.xsd'
+  model_to_use: 'model'
+  llm_url: 'http://localhost:8080'
