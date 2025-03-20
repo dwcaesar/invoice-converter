@@ -1,22 +1,17 @@
 package main
 
 import (
+	"daquam/metric"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
-	"time"
 
 	"gopkg.in/yaml.v3"
-)
-
-const (
-	layoutISO    = "2006-01-02"
-	emailPattern = `^[\w\.-]+@[\w\.-]+\.\w+$`
 )
 
 type Metric string
@@ -31,57 +26,56 @@ type MetricConfig struct {
 	Fields []string `yaml:"fields"`
 }
 
-// Employee struct to hold sample data
-type Employee struct {
-	Id        string `xml:"id"`
-	Birthdate string `xml:"birthdate"`
-	Hiredate  string `xml:"hiredate"`
-	Email     string `xml:"email"`
+type Item struct {
+	Name      string `xml:"name"`
+	Amount    string `xml:"amount"`
+	ItemPrice string `xml:"itemPrice"`
+	Vat       string `xml:"vat"`
 }
 
-type EmployeesXML struct {
-	XMLName   xml.Name   `xml:"employees"`
-	Employees []Employee `xml:"employee"`
+type Address struct {
+	Name   string `xml:"name"`
+	Street string `xml:"street"`
+	Zip    string `xml:"zip"`
+	City   string `xml:"city"`
 }
 
-// checks if the email follows a given pattern
-func validateEmail(email string) bool {
-	re := regexp.MustCompile(emailPattern)
-	return re.MatchString(email)
+type Invoice struct {
+	XMLName         xml.Name `xml:"invoice"`
+	InvoiceNumber   string   `xml:"invoiceNumber"`
+	BillingAddress  Address  `xml:"billingAddress"`
+	ShippingAddress Address  `xml:"shippingAddress"`
+	PaymentMethod   string   `xml:"paymentMethod"`
+	Items           []Item   `xml:"items>item"`
+	Netto           string   `xml:"netto"`
+	Brutto          string   `xml:"brutto"`
 }
 
 // Completeness is given when all value are set and not empty
-func validateCompleteness(fields []string, record map[string]string) bool {
-	for _, field := range fields {
-		value, exists := record[field]
-		if !exists || len(strings.TrimSpace(value)) == 0 {
-			return false
-		}
-	}
-	return true
-}
-
-// We considfer Intra-record and Format Consistenies here
-func validateConsistency(fields []string, record map[string]string) bool {
+func validateInvoiceCompleteness(fields []string, record map[string]interface{}) bool {
 
 	for _, field := range fields {
 		value, exists := record[field]
-
-		if !exists {
+		if !exists || value == nil {
+			log.Default().Printf("the record's field %s was incomplete", field)
 			return false
 		}
 
 		switch field {
-		case "Email":
-			if !validateEmail(value) {
+		case "BillingAddress", "ShippingAddress":
+			if !metric.IsAddressComplete(value) {
+				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
-		case "Birthdate":
-			if !validateHiredateBirthdateConsistency(record) {
+		case "Items":
+			if !metric.IsItemsComplete(value) {
+				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
-		case "Hiredate":
-			if !validateHiredateBirthdateConsistency(record) {
+		default:
+			str := strings.TrimSpace(fmt.Sprintf("%s", value))
+			if len(str) == 0 {
+				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		}
@@ -89,32 +83,37 @@ func validateConsistency(fields []string, record map[string]string) bool {
 	return true
 }
 
-func validateHiredateBirthdateConsistency(record map[string]string) bool {
-	valueHire, existsHire := record["Hiredate"]
-	valueBirth, existsBirth := record["Birthdate"]
-
-	if !existsBirth || !existsHire {
-		return false
+// We consider Intra-record and Format Consistencies here
+func validateInvoiceConsistency(fields []string, record map[string]interface{}) bool {
+	for _, field := range fields {
+		switch field {
+		case "Brutto", "Netto":
+			if !metric.IsBruttoNettoConsistent(record) {
+				return false
+			}
+		case "Items":
+			if !metric.IsNettoPriceConsistent(record) {
+				return false
+			}
+		default:
+			return false
+		}
 	}
-
-	birth, err1 := time.Parse(layoutISO, valueBirth)
-	hire, err2 := time.Parse(layoutISO, valueHire)
-
-	return err1 == nil && err2 == nil && birth.Before(hire)
+	return true
 }
 
-func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]string) bool, error) {
+func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]interface{}) bool, error) {
 	switch metric {
 	case Completeness:
-		return validateCompleteness, nil
+		return validateInvoiceCompleteness, nil
 	case Consistency:
-		return validateConsistency, nil
+		return validateInvoiceConsistency, nil
 	default:
 		return nil, errors.New("unexected metric")
 	}
 }
 
-func calculateMetric(metric Metric, fields []string, records []map[string]string) float64 {
+func calculateMetric(metric Metric, fields []string, records []map[string]interface{}) float64 {
 	totalRecords := len(records)
 	if totalRecords == 0 {
 		log.Println("empty employees array")
@@ -123,13 +122,13 @@ func calculateMetric(metric Metric, fields []string, records []map[string]string
 
 	validRecords := 0
 
-	vlaidationFunc, err := getCalcFunctionForMetric(metric)
+	validationFunc, err := getCalcFunctionForMetric(metric)
 	if err != nil {
 		log.Printf("coudnt determine the validation function for %s due to %s", metric, err)
 		return 0
 	}
 	for _, rec := range records {
-		if vlaidationFunc(fields, rec) {
+		if validationFunc(fields, rec) {
 			validRecords++
 		}
 	}
@@ -139,48 +138,42 @@ func calculateMetric(metric Metric, fields []string, records []map[string]string
 	return float64(validRecords) / float64(totalRecords)
 }
 
-// Metric value calculated as metric = validRecords / totalRecords.
-// Determine the amount of valid records by applying validationRecordFunc to every record in []Employee
-func convertEmployeeToMap(emp Employee) (map[string]string, error) {
-	var result map[string]string
-	jsonBytes, err := json.Marshal(emp)
-
+func convertInvoiceToMap(invoice Invoice) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	jsonBytes, err := json.Marshal(invoice)
 	if err != nil {
 		return nil, err
 	}
-
-	if err = json.Unmarshal(jsonBytes, &result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	err = json.Unmarshal(jsonBytes, &result)
+	return result, err
 }
 
 func main() {
-	files, err := filepath.Glob("assets/*.xml")
+	files, err := filepath.Glob("assets/invoice*.xml")
 	if err != nil {
-		log.Println("Error finding XML files:", err)
-		return
-	} else if len(files) == 0 {
+		log.Fatalf("Error finding XML files: %v", err) // Fatalf logs the error and exits
+	}
+
+	if len(files) == 0 {
 		log.Println("No XML files found in the current folder.")
 		return
 	}
 
-	var employees []Employee
+	var invoices []Invoice
 
 	// Read and parse each XML file
 	for _, file := range files {
 		log.Println("Processing file:", file)
-		if empl, err := parseXML(file); err == nil {
-			employees = append(employees, empl...)
+		if inv, err := parseInvoiceXML(file); err == nil {
+			invoices = append(invoices, inv)
 		}
 	}
 
-	var employeesMap []map[string]string
+	var invoiceRecords []map[string]interface{}
 
-	for _, emp := range employees {
-		if result, err := convertEmployeeToMap(emp); err == nil {
-			employeesMap = append(employeesMap, result)
+	for _, i := range invoices {
+		if result, err := convertInvoiceToMap(i); err == nil {
+			invoiceRecords = append(invoiceRecords, result)
 		}
 	}
 
@@ -190,7 +183,7 @@ func main() {
 	}
 
 	for _, conf := range config {
-		metricValue := calculateMetric(conf.Id, conf.Fields, employeesMap) * 100
+		metricValue := calculateMetric(conf.Id, conf.Fields, invoiceRecords) * 100
 		log.Printf("Metric %s: %.2f%%\n", conf.Id, metricValue)
 	}
 }
@@ -214,22 +207,22 @@ func parseYamlConfig(filename string) ([]MetricConfig, error) {
 	return metricsConfig, nil
 }
 
-func parseXML(filename string) ([]Employee, error) {
+func parseInvoiceXML(filename string) (Invoice, error) {
 	// Read the XML file
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Printf("Failed to read file %s: %v\n", filename, err)
-		return nil, err
+		return Invoice{}, err
 	}
 
 	// Parse the XML into the Employees struct
-	var employees EmployeesXML
-	err = xml.Unmarshal(data, &employees)
+	var invoice Invoice
+	err = xml.Unmarshal(data, &invoice)
 	if err != nil {
 		log.Printf("Failed to parse XML in %s: %v\n", filename, err)
-		return nil, err
+		return Invoice{}, err
 	}
 
-	log.Printf("parsed %d records", len(employees.Employees))
-	return employees.Employees, nil
+	log.Printf("read invoice %s", invoice)
+	return invoice, nil
 }

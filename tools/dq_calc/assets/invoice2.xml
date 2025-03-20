@@ -1,0 +1,32 @@
+<invoice>
+    <invoiceNumber>231</invoiceNumber>
+    <billingAddress>
+        <name>John Smith</name>
+        <street>Hawaii Street 1</street>
+        <zip>13141</zip>
+        <city>Hawaii</city>
+    </billingAddress>
+    <shippingAddress>
+        <name>John Smith</name>
+        <street>Tahiti Street 2</street>
+        <zip>245135</zip>
+        <city>Tahiti</city>
+    </shippingAddress>
+    <paymentMethod>credit-card</paymentMethod>
+    <items>
+        <item>
+            <name>Product A</name>
+            <amount>2</amount>
+            <itemPrice>50.00</itemPrice>
+            <vat>full</vat>
+        </item>
+        <item>
+            <name>Product B</name>
+            <amount>1</amount>
+            <itemPrice>30.00</itemPrice>
+            <vat>reduced</vat>
+        </item>
+    </items>
+    <netto>130.00</netto>
+    <brutto>154.70</brutto>
+</invoice>
