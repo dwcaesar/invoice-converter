@@ -1,26 +1,22 @@
 package de.dwcaesar.invoiceConverter.invoice;
 
 import de.dwcaesar.invoiceConverter.invoice.model.*;
+import de.dwcaesar.invoiceConverter.io.model.Vat;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class InvoiceConverter {
-
-    private final BigDecimal VAT_FULL = BigDecimal.valueOf(19, 2);
-    private final BigDecimal VAT_REDUCED = BigDecimal.valueOf(7, 2);
 
     public Invoice convert(de.dwcaesar.invoiceConverter.io.model.Invoice invoice) {
         Address shippingAddress = getShippingAddress(invoice.getShippingAddress());
         Address billingAddress = getBillingAddress(invoice.getBillingAddress())
                 .orElse(shippingAddress);
-        ItemsAndPartialSums itemsAndPartialSums = getItemsAndPartialSums(invoice.getItems());
+        ItemsAndPartialSums itemsAndPartialSums = getItemsAndPartialSums(invoice.getItems(), invoice.getVat());
 
         return Invoice.builder()
                 .invoiceNumber(invoice.getInvoiceNumber().intValue())
@@ -36,7 +32,13 @@ public class InvoiceConverter {
                 .totalSumBrutto(invoice.getBrutto())
                 .partialSumFull(itemsAndPartialSums.partialSumFull)
                 .partialSumReduced(itemsAndPartialSums.partialSumReduced)
+                .vatRates(mapVatRates(invoice.getVat()))
                 .build();
+    }
+
+    private Map<VATType, BigDecimal> mapVatRates(Map<Vat, BigDecimal> vat) {
+        return Map.of(VATType.FULL, vat.getOrDefault(Vat.FULL, BigDecimal.ZERO),
+                VATType.REDUCED, vat.getOrDefault(Vat.REDUCED, BigDecimal.ZERO));
     }
 
     private Address getShippingAddress(de.dwcaesar.invoiceConverter.io.model.Address shippingAddress) {
@@ -61,18 +63,18 @@ public class InvoiceConverter {
         }
     }
 
-    private ItemsAndPartialSums getItemsAndPartialSums(List<de.dwcaesar.invoiceConverter.io.model.Item> items) {
+    private ItemsAndPartialSums getItemsAndPartialSums(List<de.dwcaesar.invoiceConverter.io.model.Item> items, Map<Vat, BigDecimal> vat) {
         BigDecimal partialSumFull = BigDecimal.ZERO;
         BigDecimal partialSumReduced = BigDecimal.ZERO;
         List<Item> convertedItems = new ArrayList<>();
         for (de.dwcaesar.invoiceConverter.io.model.Item item : items) {
             VATType vatType = switch (item.getVat()) {
                 case FULL -> {
-                    partialSumFull = partialSumFull.add(toVatPortion(item.getItemPrice(), item.getAmount(), VAT_FULL));
+                    partialSumFull = partialSumFull.add(toVatPortion(item.getItemPrice(), item.getAmount(), vat.get(Vat.FULL)));
                     yield VATType.FULL;
                 }
                 case REDUCED -> {
-                    partialSumReduced = partialSumReduced.add(toVatPortion(item.getItemPrice(), item.getAmount(), VAT_REDUCED));
+                    partialSumReduced = partialSumReduced.add(toVatPortion(item.getItemPrice(), item.getAmount(), vat.get(Vat.REDUCED)));
                     yield VATType.REDUCED;
                 }
                 case NONE -> VATType.NONE;

@@ -32,5 +32,9 @@
   "partialSumFull": 15.97,
   "partialSumReduced": 1.96,
   "totalSumNetto": 130.00,
-  "totalSumBrutto": 154.70
+  "totalSumBrutto": 154.70,
+  "vatRates": {
+    "FULL": 0.19,
+    "REDUCED": 0.07
+  }
 }
