@@ -58,7 +58,7 @@ To start the process some groundwork is required first:
 
 Testdata can be generated and persisted using [generator client](tools/generator_client/main.go).
 The data quality can be measured using [dq calc](tools/dq_calc/main.go).
-As of #7 dq_calc supports the following metrics:
+As of [#7](https://github.com/dwcaesar/invoice-converter/pull/7) dq_calc supports the following metrics:
 * completeness
   * Address with Name, Street, ZIP, and City set
   * Item with Name, Amount, Item price, and VAT set
