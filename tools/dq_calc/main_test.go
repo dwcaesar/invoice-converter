@@ -268,7 +268,7 @@ func convertAdressToMap(object interface{}) (map[string]interface{}, error) {
 
 func TestCalcMetricEmptyInput(t *testing.T) {
 	value := calculateMetric(Consistency, nil, nil)
-	assert.Equal(t, value, 0)
+	assert.Equal(t, value, float64(0))
 }
 
 func TestCalcMetricOutput(t *testing.T) {
