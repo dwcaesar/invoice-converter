@@ -3,6 +3,7 @@ package main
 import (
 	"daquam/assert"
 	"daquam/metric"
+	"daquam/report"
 	"encoding/json"
 	"log"
 	"testing"
@@ -19,9 +20,13 @@ func TestTrueInvoiceCompleteness(t *testing.T) {
 		},
 		Items: []Item{{ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}, {ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}},
 	}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
 	if record, err := convertInvoiceToMap(invoice); err == nil {
-		validateInvoiceCompleteness([]string{"Netto", "BillingAddress", "Items"}, record)
+		validateInvoiceCompleteness([]string{"Netto", "BillingAddress", "Items"}, record, reportMock)
 	} else {
 		t.FailNow()
 	}
@@ -40,9 +45,13 @@ func TestTrueNettoPriceConsistent(t *testing.T) {
 		},
 		Items: []Item{{ItemPrice: "40.30", Amount: "2", Vat: "v", Name: "n"}, {ItemPrice: "20.15", Amount: "1", Vat: "v", Name: "n"}},
 	}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
 	if record, err := convertInvoiceToMap(invoice); err == nil {
-		result := metric.IsNettoPriceConsistent(record)
+		result := metric.IsNettoPriceConsistent(record, reportMock)
 		assert.Equal(t, result, true)
 	} else {
 		t.FailNow()
@@ -61,9 +70,13 @@ func TestFalseNettoPriceConsistent(t *testing.T) {
 		},
 		Items: []Item{{ItemPrice: "40.0", Amount: "1"}, {ItemPrice: "20.0", Amount: "1"}},
 	}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
 	if record, err := convertInvoiceToMap(invoice); err == nil {
-		result := metric.IsNettoPriceConsistent(record)
+		result := metric.IsNettoPriceConsistent(record, reportMock)
 		assert.Equal(t, result, false)
 	} else {
 		t.FailNow()
@@ -81,7 +94,7 @@ func TestFalseNettoPriceConsistent(t *testing.T) {
 	}
 
 	if record, err := convertInvoiceToMap(invoice); err == nil {
-		result := metric.IsNettoPriceConsistent(record)
+		result := metric.IsNettoPriceConsistent(record, reportMock)
 		assert.Equal(t, result, false)
 	} else {
 		t.FailNow()
@@ -99,8 +112,13 @@ func TestFalseInvoiceCompleteness(t *testing.T) {
 		Items: []Item{{ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}, {ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}},
 	}
 
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
+
 	if record, err := convertInvoiceToMap(invoice); err == nil {
-		assert.Equal(t, validateInvoiceCompleteness([]string{"Netto", "BillingAddress", "Items"}, record), false)
+		assert.Equal(t, validateInvoiceCompleteness([]string{"Netto", "BillingAddress", "Items"}, record, reportMock), false)
 	} else {
 		t.FailNow()
 	}
@@ -116,7 +134,7 @@ func TestFalseInvoiceCompleteness(t *testing.T) {
 	}
 
 	if record, err := convertInvoiceToMap(invoice); err == nil {
-		assert.Equal(t, validateInvoiceCompleteness([]string{"ShippingAddress", "Items"}, record), false)
+		assert.Equal(t, validateInvoiceCompleteness([]string{"ShippingAddress", "Items"}, record, reportMock), false)
 	} else {
 		t.FailNow()
 	}
@@ -124,9 +142,13 @@ func TestFalseInvoiceCompleteness(t *testing.T) {
 
 func TestTrueItemsCompleteness(t *testing.T) {
 	items := []Item{{ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}, {ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
 	records := marshalItems(items)
-	assert.Equal(t, metric.IsItemsComplete(records), true)
+	assert.Equal(t, metric.IsItemsComplete(records, "", reportMock), true)
 }
 
 func marshalItems(items []Item) []interface{} {
@@ -149,12 +171,16 @@ func marshalItems(items []Item) []interface{} {
 }
 func TestFalseItemsCompleteness(t *testing.T) {
 	items := []Item{{ItemPrice: "a", Amount: "s", Vat: "v", Name: "n"}, {ItemPrice: " ", Amount: "s", Vat: "v", Name: "n"}}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 	records := marshalItems(items)
-	assert.Equal(t, metric.IsItemsComplete(records), false)
+	assert.Equal(t, metric.IsItemsComplete(records, "", reportMock), false)
 
 	items = []Item{{ItemPrice: "a", Vat: "v", Name: "n"}, {ItemPrice: "i", Amount: "s", Vat: "v", Name: "n"}}
 	records = marshalItems(items)
-	assert.Equal(t, metric.IsItemsComplete(records), false)
+	assert.Equal(t, metric.IsItemsComplete(records, "", reportMock), false)
 }
 
 func TestTrueAddressCompletness(t *testing.T) {
@@ -164,14 +190,21 @@ func TestTrueAddressCompletness(t *testing.T) {
 		Street: " str",
 		City:   "city",
 	}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
-	assert.Equal(t, metric.IsAddressComplete(address), true)
+	assert.Equal(t, metric.IsAddressComplete(address, "", reportMock), true)
 }
 
 func TestTrueBruttoNettoConsistent(t *testing.T) {
 	record := map[string]interface{}{"Brutto": "12.304", "Netto": "0.01"}
-
-	result := metric.IsBruttoNettoConsistent(record)
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
+	result := metric.IsBruttoNettoConsistent(record, reportMock)
 
 	assert.Equal(t, result, true)
 }
@@ -179,15 +212,18 @@ func TestTrueBruttoNettoConsistent(t *testing.T) {
 func TestFalseBruttoNettoConsistent(t *testing.T) {
 	//wrong precision
 	record := map[string]interface{}{"Brutto": "12.3", "Netto": "0.01"}
-
-	result := metric.IsBruttoNettoConsistent(record)
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
+	result := metric.IsBruttoNettoConsistent(record, reportMock)
 
 	assert.Equal(t, result, false)
 
 	//Netto missing
 	record = map[string]interface{}{"Brutto": "12.3"}
 
-	result = metric.IsBruttoNettoConsistent(record)
+	result = metric.IsBruttoNettoConsistent(record, reportMock)
 
 	assert.Equal(t, result, false)
 }
@@ -199,8 +235,12 @@ func TestFalseAddressCompletness(t *testing.T) {
 		Street: " str",
 		City:   "city",
 	}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
-	assert.Equal(t, metric.IsAddressComplete(address1), false)
+	assert.Equal(t, metric.IsAddressComplete(address1, "", reportMock), false)
 
 	address2 := Address{
 		Name: "n ",
@@ -208,21 +248,29 @@ func TestFalseAddressCompletness(t *testing.T) {
 		City: "city",
 	}
 
-	assert.Equal(t, metric.IsAddressComplete(address2), false)
+	assert.Equal(t, metric.IsAddressComplete(address2, "", reportMock), false)
 }
 
 func TestTrueSimpleRecordCompletness(t *testing.T) {
 	record := map[string]string{"key1": "value1", "key2": "value2"}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
-	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"key1", "key2"}, record), true)
+	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"key1", "key2"}, record, "", reportMock), true)
 }
 
 func TestFalseRecordCompletness(t *testing.T) {
 	record := map[string]string{"key1": " ", "key2": ""}
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
-	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"keyX"}, record), false)
-	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"key1"}, record), false)
-	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"key2"}, record), false)
+	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"keyX"}, record, "", reportMock), false)
+	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"key1"}, record, "", reportMock), false)
+	assert.Equal(t, metric.IsSimpleRecordComplete([]string{"key2"}, record, "", reportMock), false)
 }
 func TestFalseAdressCompletenessWithMissingField(t *testing.T) {
 	var adr = Address{
@@ -231,11 +279,15 @@ func TestFalseAdressCompletenessWithMissingField(t *testing.T) {
 		Street: "a",
 	}
 	adress, err := convertAdressToMap(adr)
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
 	if err != nil {
 		t.FailNow()
 	}
-	assert.Equal(t, metric.IsAddressComplete(adress), false)
+	assert.Equal(t, metric.IsAddressComplete(adress, "", reportMock), false)
 }
 func TestTrueAdressCompleteness(t *testing.T) {
 	var adr = Address{
@@ -245,11 +297,15 @@ func TestTrueAdressCompleteness(t *testing.T) {
 		Street: "a",
 	}
 	adress, err := convertAdressToMap(adr)
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
 
 	if err != nil {
 		t.FailNow()
 	}
-	assert.Equal(t, metric.IsAddressComplete(adress), true)
+	assert.Equal(t, metric.IsAddressComplete(adress, "", reportMock), true)
 }
 
 func convertAdressToMap(object interface{}) (map[string]interface{}, error) {
@@ -267,7 +323,11 @@ func convertAdressToMap(object interface{}) (map[string]interface{}, error) {
 }
 
 func TestCalcMetricEmptyInput(t *testing.T) {
-	value := calculateMetric(Consistency, nil, nil)
+	reportMock, _ := report.NewReport(t.TempDir())
+	defer func(reportMock *report.Report) {
+		_ = reportMock.CloseReport()
+	}(reportMock)
+	value := calculateMetric(Consistency, nil, nil, reportMock)
 	assert.Equal(t, value, float64(0))
 }
 

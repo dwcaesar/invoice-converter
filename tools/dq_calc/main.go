@@ -2,6 +2,7 @@ package main
 
 import (
 	"daquam/metric"
+	"daquam/report"
 	"encoding/json"
 	"encoding/xml"
 	"errors"
@@ -52,31 +53,41 @@ type Invoice struct {
 }
 
 // Completeness is given when all value are set and not empty
-func validateInvoiceCompleteness(fields []string, record map[string]interface{}) bool {
+func validateInvoiceCompleteness(fields []string, record map[string]interface{}, csvReport *report.Report) bool {
 
 	for _, field := range fields {
 		value, exists := record[field]
+		csvReport.NewEntry(field, "FieldExists")
 		if !exists || value == nil {
 			log.Default().Printf("the record's field %s was incomplete", field)
+			csvReport.CloseEntry(nil, false, "field is missing")
 			return false
+		} else {
+			// instead of the actual value, an empty string
+			// otherwise, complex objects might be serialized in the report
+			csvReport.CloseEntry("", true, "")
 		}
 
 		switch field {
 		case "BillingAddress", "ShippingAddress":
-			if !metric.IsAddressComplete(value) {
+			if !metric.IsAddressComplete(value, field, csvReport) {
 				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		case "Items":
-			if !metric.IsItemsComplete(value) {
+			if !metric.IsItemsComplete(value, field, csvReport) {
 				log.Default().Printf("the record's field %s was incomplete", field)
 				return false
 			}
 		default:
+			csvReport.NewEntry(field, "FieldHasValue")
 			str := strings.TrimSpace(fmt.Sprintf("%s", value))
 			if len(str) == 0 {
 				log.Default().Printf("the record's field %s was incomplete", field)
+				csvReport.CloseEntry(str, false, "")
 				return false
+			} else {
+				csvReport.CloseEntry(str, true, "")
 			}
 		}
 	}
@@ -84,15 +95,15 @@ func validateInvoiceCompleteness(fields []string, record map[string]interface{})
 }
 
 // We consider Intra-record and Format Consistencies here
-func validateInvoiceConsistency(fields []string, record map[string]interface{}) bool {
+func validateInvoiceConsistency(fields []string, record map[string]interface{}, csvReport *report.Report) bool {
 	for _, field := range fields {
 		switch field {
 		case "Brutto", "Netto":
-			if !metric.IsBruttoNettoConsistent(record) {
+			if !metric.IsBruttoNettoConsistent(record, csvReport) {
 				return false
 			}
 		case "Items":
-			if !metric.IsNettoPriceConsistent(record) {
+			if !metric.IsNettoPriceConsistent(record, csvReport) {
 				return false
 			}
 		default:
@@ -102,7 +113,7 @@ func validateInvoiceConsistency(fields []string, record map[string]interface{}) 
 	return true
 }
 
-func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]interface{}) bool, error) {
+func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[string]interface{}, csvReport *report.Report) bool, error) {
 	switch metric {
 	case Completeness:
 		return validateInvoiceCompleteness, nil
@@ -113,10 +124,10 @@ func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[s
 	}
 }
 
-func calculateMetric(metric Metric, fields []string, records []map[string]interface{}) float64 {
+func calculateMetric(metric Metric, fields []string, records []map[string]interface{}, csvReport *report.Report) float64 {
 	totalRecords := len(records)
 	if totalRecords == 0 {
-		log.Println("empty employees array")
+		log.Println("no records found")
 		return 0
 	}
 
@@ -128,7 +139,7 @@ func calculateMetric(metric Metric, fields []string, records []map[string]interf
 		return 0
 	}
 	for _, rec := range records {
-		if validationFunc(fields, rec) {
+		if validationFunc(fields, rec, csvReport) {
 			validRecords++
 		}
 	}
@@ -182,8 +193,16 @@ func main() {
 		log.Default().Fatal("Error finding yaml file:", err)
 	}
 
+	csvReport, err := report.NewReport("assets")
+	defer func(csvReport *report.Report) {
+		err := csvReport.CloseReport()
+		if err != nil {
+			log.Default().Printf("Error closing report: %v", err)
+		}
+	}(csvReport)
+
 	for _, conf := range config {
-		metricValue := calculateMetric(conf.Id, conf.Fields, invoiceRecords) * 100
+		metricValue := calculateMetric(conf.Id, conf.Fields, invoiceRecords, csvReport) * 100
 		log.Printf("Metric %s: %.2f%%\n", conf.Id, metricValue)
 	}
 }

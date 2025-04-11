@@ -22,7 +22,7 @@ func TestNewReport(t *testing.T) {
 			_ = report.CloseReport()
 		}(report)
 
-		expectedHeader := "TestID,Timestamp,DataSourceName,TestMethodUsed,ExpectedResult,ActualResult,Passed,Comment"
+		expectedHeader := "TestID,Timestamp,DataSourceName,TestMethodUsed,ActualResult,Passed,Comment"
 		actualHeader, err := report.ReadLine(1)
 		if err != nil {
 			t.Errorf("Error reading header: %v", err)
@@ -45,15 +45,13 @@ func TestNewEntry(t *testing.T) {
 
 		dataSourceName := "test_data.csv"
 		testMethodUsed := "TestExample"
-		expectedResult := "TestResult"
 
-		report.NewEntry(dataSourceName, testMethodUsed, expectedResult)
+		report.NewEntry(dataSourceName, testMethodUsed)
 
 		assert.Equal(t, len(report.TestEntries), 1)
 		entry := report.TestEntries[0]
 		assert.Equal(t, entry.DataSourceName, dataSourceName)
 		assert.Equal(t, entry.TestMethodUsed, testMethodUsed)
-		assert.Equal(t, entry.ExpectedResult, expectedResult)
 	})
 }
 
@@ -70,15 +68,14 @@ func TestCloseEntry(t *testing.T) {
 
 		dataSourceName := "test_data.csv"
 		testMethodUsed := "TestExample"
-		expectedResult := "TestResult"
 
-		report.NewEntry(dataSourceName, testMethodUsed, expectedResult)
+		report.NewEntry(dataSourceName, testMethodUsed)
 
 		actualResult := "actualResult"
 		comment := "passed as expected"
 
 		report.CloseEntry(actualResult, true, comment)
-		expectedLine := fmt.Sprintf("test_1,%s,test_data.csv,TestExample,TestResult,actualResult,true,passed as expected", time.Now().Format(time.RFC3339))
+		expectedLine := fmt.Sprintf("test_1,%s,test_data.csv,TestExample,actualResult,true,passed as expected", time.Now().Format(time.RFC3339))
 
 		assert.Equal(t, len(report.TestEntries), 1)
 		entry := report.TestEntries[0]

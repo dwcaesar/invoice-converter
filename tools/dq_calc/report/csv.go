@@ -34,8 +34,7 @@ type TestEntry struct {
 	Timestamp      time.Time
 	DataSourceName string
 	TestMethodUsed string
-	ExpectedResult string
-	ActualResult   string
+	ActualResult   any
 	Passed         bool
 	Comment        string
 }
@@ -48,7 +47,7 @@ func NewReport(path string) (*Report, error) {
 	}
 	writer := csv.NewWriter(file)
 
-	header := []string{"TestID", "Timestamp", "DataSourceName", "TestMethodUsed", "ExpectedResult", "ActualResult", "Passed", "Comment"}
+	header := []string{"TestID", "Timestamp", "DataSourceName", "TestMethodUsed", "ActualResult", "Passed", "Comment"}
 	if err := writer.Write(header); err != nil {
 		return nil, fmt.Errorf("error writing report header: %v", err)
 	}
@@ -61,20 +60,19 @@ func NewReport(path string) (*Report, error) {
 	}, nil
 }
 
-func (report *Report) NewEntry(dataSourceName string, testMethodUsed string, expectedResult string) {
+func (report *Report) NewEntry(dataSourceName string, testMethodUsed string) {
 	entry := TestEntry{
 		TestID:         fmt.Sprintf("test_%d", len(report.TestEntries)+1),
 		Timestamp:      time.Now(),
 		DataSourceName: dataSourceName,
 		TestMethodUsed: testMethodUsed,
-		ExpectedResult: expectedResult,
 		Passed:         false,
 		Comment:        "",
 	}
 	report.TestEntries = append(report.TestEntries, entry)
 }
 
-func (report *Report) CloseEntry(actualResult string, passed bool, comment string) {
+func (report *Report) CloseEntry(actualResult any, passed bool, comment string) {
 	if len(report.TestEntries) == 0 {
 		return
 	}
@@ -89,8 +87,7 @@ func (report *Report) CloseEntry(actualResult string, passed bool, comment strin
 		entry.Timestamp.Format(time.RFC3339),
 		entry.DataSourceName,
 		entry.TestMethodUsed,
-		entry.ExpectedResult,
-		entry.ActualResult,
+		fmt.Sprint(entry.ActualResult),
 		fmt.Sprintf("%t", passed),
 		entry.Comment,
 	}

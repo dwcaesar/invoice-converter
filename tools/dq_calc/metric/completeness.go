@@ -1,19 +1,20 @@
 package metric
 
 import (
+	"daquam/report"
 	"encoding/json"
 	"log"
 	"reflect"
 	"strings"
 )
 
-func IsAddressComplete(rec interface{}) bool {
+func IsAddressComplete(rec interface{}, parent string, report *report.Report) bool {
 	fields := [4]string{"City", "Zip", "Street", "Name"}
 
-	return IsSimpleRecordComplete(fields[:], rec)
+	return IsSimpleRecordComplete(fields[:], rec, parent, report)
 }
 
-func IsItemsComplete(rec interface{}) bool {
+func IsItemsComplete(rec interface{}, parent string, csvReport *report.Report) bool {
 	items, isConverted := rec.([]interface{})
 	if !isConverted {
 		log.Panicf("cannot convert %s", reflect.TypeOf(rec))
@@ -22,14 +23,14 @@ func IsItemsComplete(rec interface{}) bool {
 
 	fields := [4]string{"Name", "Amount", "Vat", "ItemPrice"}
 	for _, item := range items {
-		if !IsSimpleRecordComplete(fields[:], item) {
+		if !IsSimpleRecordComplete(fields[:], item, parent, csvReport) {
 			return false
 		}
 	}
 
 	return true
 }
-func IsSimpleRecordComplete(requiredFields []string, record interface{}) bool {
+func IsSimpleRecordComplete(requiredFields []string, record interface{}, parent string, r *report.Report) bool {
 	var result map[string]string
 	jsonBytes, err := json.Marshal(record)
 	if err != nil {
@@ -40,14 +41,19 @@ func IsSimpleRecordComplete(requiredFields []string, record interface{}) bool {
 	}
 
 	for _, f := range requiredFields {
+		r.NewEntry(parent+"/"+f, "IsSimpleRecordComplete")
 		if v, exist := result[f]; exist {
 			str := strings.TrimSpace(v)
 			if len(str) == 0 {
 				log.Default().Printf("the record's field %s was incomplete", f)
+				r.CloseEntry(str, false, "field is empty")
 				return false
+			} else {
+				r.CloseEntry(str, true, "")
 			}
 		} else {
 			log.Default().Printf("the record's field %s not existing", f)
+			r.CloseEntry(nil, false, "field is missing")
 			return false
 		}
 	}
