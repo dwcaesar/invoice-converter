@@ -2,12 +2,12 @@ package assert
 
 import "testing"
 
-func Equal[V comparable](t *testing.T, got, expected V) {
+func Equal(t *testing.T, got any, expected any) {
 	t.Helper()
 
 	if expected != got {
 		t.Errorf(`assert.Equal
-			got: %v,
+			got: %v
 			expected: %v`, got, expected)
 	}
 }
