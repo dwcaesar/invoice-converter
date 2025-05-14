@@ -68,6 +68,28 @@ As of [#7](https://github.com/dwcaesar/invoice-converter/pull/7) dq_calc support
 
 Given these metrics, we start the development process with improving data quality until 70 % of all generated data are "complete" and "consistent".
 
+## API Documentation
+
+The application includes comprehensive API documentation using Swagger/OpenAPI. This documentation provides detailed information about the API endpoints, request/response models, and error handling.
+
+### Accessing the Documentation
+
+When the application is running, you can access the API documentation in the following ways:
+
+- **Swagger UI**: Navigate to [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) in your web browser to view the interactive API documentation. This interface allows you to explore the API endpoints, view model schemas, and even test the API directly from your browser.
+
+- **OpenAPI Specification**: The raw OpenAPI specification in JSON format is available at [http://localhost:8080/api-docs](http://localhost:8080/api-docs). This can be used with other tools that support the OpenAPI specification.
+
+### Features
+
+The API documentation includes:
+
+- Detailed descriptions of all endpoints
+- Request and response schemas
+- Example values for request parameters
+- Possible response codes and their meanings
+- Authentication requirements (if applicable)
+
 ## Conclusion
 TBD
 

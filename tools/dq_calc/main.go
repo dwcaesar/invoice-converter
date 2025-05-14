@@ -109,7 +109,7 @@ func getCalcFunctionForMetric(metric Metric) (func(fields []string, record map[s
 	case Consistency:
 		return validateInvoiceConsistency, nil
 	default:
-		return nil, errors.New("unexected metric")
+		return nil, errors.New("unexpected metric")
 	}
 }
 
@@ -124,7 +124,7 @@ func calculateMetric(metric Metric, fields []string, records []map[string]interf
 
 	validationFunc, err := getCalcFunctionForMetric(metric)
 	if err != nil {
-		log.Printf("coudnt determine the validation function for %s due to %s", metric, err)
+		log.Printf("couldn't determine the validation function for %s due to %s", metric, err)
 		return 0
 	}
 	for _, rec := range records {
